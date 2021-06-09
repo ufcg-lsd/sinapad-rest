@@ -1,0 +1,16 @@
+package br.lncc.sinapad.rest.service;
+
+import br.lncc.sinapad.rest.RestOperationTest;
+import br.lncc.sinapad.rest.data.ListServiceResult;
+import br.lncc.sinapad.rest.utils.RESTResultCodes;
+
+public class ServiceRESTOperationTest extends RestOperationTest {
+
+	ServiceRESTOperation rest = new ServiceRESTOperation();
+
+	public void testListSuccess() {
+		ListServiceResult result = rest.list();
+		assertEquals(RESTResultCodes.OK, result.getCode());
+	}
+
+}

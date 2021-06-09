@@ -1,0 +1,15 @@
+<services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="services.xsd">
+	<service>
+		<id>Arrebol</id>
+		<configuration-service>br.lncc.sinapad.adapter.arrebol.configuration.ArrebolConfigurationService</configuration-service>
+		<application-service>br.lncc.sinapad.adapter.arrebol.application.ArrebolApplicationService</application-service>
+		<application-converter-service>br.lncc.sinapad.adapter.arrebol.application.converter.ArrebolApplicationConverter</application-converter-service>
+		<authentication-service>br.lncc.sinapad.adapter.arrebol.authentication.ArrebolAuthenticationService</authentication-service>
+		<file-service>br.lncc.sinapad.adapter.arrebol.file.ArrebolFileService</file-service>
+		<job-monitoring-service>br.lncc.sinapad.adapter.arrebol.monitoring.ArrebolJobMonitoringService</job-monitoring-service>
+		<resource-monitoring-service>br.lncc.sinapad.adapter.arrebol.monitoring.ArrebolResourceMonitoringService</resource-monitoring-service>
+		<job-submission-service>br.lncc.sinapad.adapter.arrebol.submission.ArrebolJobSubmissionService</job-submission-service>
+	</service>	
+</services>
+

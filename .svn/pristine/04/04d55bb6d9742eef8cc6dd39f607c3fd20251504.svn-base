@@ -1,0 +1,176 @@
+package br.lncc.sinapad.rest.submission;
+
+import java.util.UUID;
+
+import br.lncc.sinapad.core.data.ResultData.Status;
+import br.lncc.sinapad.rest.RestOperationTest;
+import br.lncc.sinapad.rest.data.JobSubmissonResult;
+import br.lncc.sinapad.rest.data.Result;
+import br.lncc.sinapad.rest.data.StatusResult;
+import br.lncc.sinapad.rest.file.FileRESTOperation;
+import br.lncc.sinapad.rest.monitoring.JobMonitoringRESTOperation;
+import br.lncc.sinapad.rest.utils.RESTResultCodes;
+
+public class JobSubmissionRESTOperationTest extends RestOperationTest {
+
+	JobSubmissionRESTOperation rest = new JobSubmissionRESTOperation();
+	FileRESTOperation fileRest = new FileRESTOperation();
+	JobMonitoringRESTOperation jobMonitoringRest = new JobMonitoringRESTOperation();
+
+	public void testRunAndCancelSuccess() {
+		JobSubmissonResult jobResult = null;
+		try {
+			String parameters = loadParameters();
+			jobResult = rest.run(service, userUUIDValid, projectValid, applicationValid, versionValid, null, parameters, null, null);
+			assertEquals(RESTResultCodes.OK, jobResult.getCode());
+
+		} catch (Exception e) {
+			assertTrue(false);
+		} finally {
+			try {
+				StatusResult statusResult;
+				do {
+					statusResult = jobMonitoringRest.get(service, userUUIDValid, projectValid, jobResult.getJobId(), null);
+					if (statusResult.getStatus().equals(Status.FAILED) || statusResult.getStatus().equals(Status.UNDETERMINED)) {
+						assertTrue(false);
+					}
+				} while (!statusResult.getStatus().equals(Status.DONE));
+
+				result = jobMonitoringRest.delete(service, userUUIDValid, projectValid, jobResult.getJobId(), null);
+				assertEquals(RESTResultCodes.OK, result.getCode());
+
+				clearParameters();
+			} catch (Exception e) {
+				assertTrue(false);
+			}
+		}
+	}
+
+	public void testRunErrorUserNotAuthorized() {
+		try {
+			String invalidUUID = UUID.randomUUID().toString();
+			String parameters = loadParameters();
+			JobSubmissonResult jobResult = rest.run(service, invalidUUID, projectValid, applicationValid, versionValid, null, parameters, null, null);
+			assertEquals(RESTResultCodes.NOT_AUTHORIZED, jobResult.getCode());
+		} finally {
+			try {
+				clearParameters();
+			} catch (Exception e) {
+				assertTrue(false);
+			}
+		}
+	}
+
+	public void testRunErrorProjectDoesNotExist() {
+		try {
+			String parameters = loadParameters();
+			JobSubmissonResult jobResult = rest.run(service, userUUIDValid, projectInvalid, applicationValid, versionValid, null, parameters, null, null);
+			assertEquals(RESTResultCodes.PROJECT_NOT_FOUND, jobResult.getCode());
+		} finally {
+			try {
+				clearParameters();
+			} catch (Exception e) {
+				assertTrue(false);
+			}
+		}
+	}
+
+	public void testRunErrorNotExists() {
+		String invalidParameters = UUID.randomUUID().toString();
+
+		JobSubmissonResult jobResult = rest.run(service, userUUIDValid, projectValid, applicationValid, versionValid, null, invalidParameters + "::" + invalidParameters, null, null);
+		assertEquals(RESTResultCodes.USER_ERROR, jobResult.getCode());
+		//assertEquals(RESTResultCodes.MISSING_REQUIRED_APP_ARG, jobResult.getCode());
+	}
+
+	public void testRunErrorNull() {
+		String invalidParameters = UUID.randomUUID().toString();
+
+		JobSubmissonResult jobResult = rest.run(service, userUUIDValid, projectValid, applicationValid, versionValid, null, invalidParameters + "::" + invalidParameters, null, null);
+		//assertEquals(RESTResultCodes.MISSING_REQUIRED_APP_ARG, jobResult.getCode());
+		assertEquals(RESTResultCodes.USER_ERROR, jobResult.getCode());
+
+		jobResult = rest.run(service, userUUIDValid, projectValid, applicationValid, null, null, invalidParameters, null, null);
+		assertEquals(RESTResultCodes.USER_ERROR, jobResult.getCode());
+
+		jobResult = rest.run(service, userUUIDValid, projectValid, applicationValid, null, null, invalidParameters, null, null);
+		assertEquals(RESTResultCodes.USER_ERROR, jobResult.getCode());
+
+		jobResult = rest.run(service, userUUIDValid, projectValid, null, versionValid, null, invalidParameters, null, null);
+		assertEquals(RESTResultCodes.USER_ERROR, jobResult.getCode());
+
+		jobResult = rest.run(service, userUUIDValid, projectValid, null, versionValid, null, invalidParameters, null, null);
+		assertEquals(RESTResultCodes.USER_ERROR, jobResult.getCode());
+
+		jobResult = rest.run(service, null, projectValid, applicationValid, versionValid, null, invalidParameters, null, null);
+		assertEquals(RESTResultCodes.USER_ERROR, jobResult.getCode());
+
+		jobResult = rest.run(service, null, userUUIDValid, applicationValid, versionValid, null, invalidParameters, null, null);
+		assertEquals(RESTResultCodes.USER_ERROR, jobResult.getCode());
+
+		jobResult = rest.run(service, null, null, null, versionValid, null, invalidParameters, null, null);
+		assertEquals(RESTResultCodes.USER_ERROR, jobResult.getCode());
+
+		jobResult = rest.run(null, null, null, null, versionValid, null, invalidParameters, null, null);
+		assertEquals(RESTResultCodes.SERVICE_NOT_FOUND, jobResult.getCode());
+	}
+
+	public void testRunErrorInvalidServiceName() {
+		String parameters = UUID.randomUUID().toString();
+		String invalidServiceName = UUID.randomUUID().toString();
+
+		JobSubmissonResult jobResult = rest.run(invalidServiceName, userUUIDValid, projectValid, applicationValid, versionValid, null, parameters, null, null);
+		assertEquals(RESTResultCodes.SERVICE_NOT_FOUND, jobResult.getCode());
+	}
+
+	public void testCancelErrorNotExists() {
+		String invalidJobId = "UUID.randomUUID().toString()";
+		Result result = rest.cancel(service, userUUIDValid, projectValid, invalidJobId, null);
+		assertEquals(RESTResultCodes.JOB_CANNOT_BE_CANCELLED, result.getCode());
+	}
+
+	public void testCancelErrorNull() {
+		String invalidJobId = "UUID.randomUUID().toString()";
+		Result result = rest.cancel(service, userUUIDValid, projectValid, null, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.cancel(service, null, userUUIDValid, invalidJobId, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.cancel(service, null, userUUIDValid, null, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.cancel(service, null, projectValid, invalidJobId, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.cancel(service, null, projectValid, null, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.cancel(service, null, null, invalidJobId, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.cancel(service, null, null, null, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.cancel(null, null, null, null, null);
+		assertEquals(RESTResultCodes.SERVICE_NOT_FOUND, result.getCode());
+	}
+	
+	public void testRunApplicationNotFound() {
+		JobSubmissonResult jobResult = null;
+		try {
+			String parameters = loadParameters();
+			jobResult = rest.run(service, userUUIDValid, projectValid, applicationInvalid, versionValid, null, parameters, null, null);
+			assertEquals(RESTResultCodes.NOT_AUTHORIZED, jobResult.getCode());
+		} catch (Exception e) {
+			assertTrue(false);
+		} finally {
+			try {
+				clearParameters();
+			} catch (Exception e) {
+				assertTrue(false);
+			}
+		}
+	}
+
+}

@@ -1,0 +1,838 @@
+package br.lncc.sinapad.rest.file;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.UUID;
+
+import javax.ws.rs.core.Response;
+
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+
+import br.lncc.sinapad.rest.RestOperationTest;
+import br.lncc.sinapad.rest.data.FileResult;
+import br.lncc.sinapad.rest.data.Result;
+import br.lncc.sinapad.rest.utils.RESTResultCodes;
+
+public class FileRestOperationTest extends RestOperationTest {
+
+	private FileRESTOperation rest = new FileRESTOperation();
+
+	public void testExistsSuccessFileExists() {
+		String parents = "dir" + UUID.randomUUID().toString() + "test_rest";
+		String fileName = "file" + UUID.randomUUID().toString() + "test_rest";
+		try {
+			result = rest.exists(service, userUUIDValid, projectValid, null, null, null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+
+			result = rest.create(service, userUUIDValid, projectValid, null, parents, "true", null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+
+			result = rest.create(service, userUUIDValid, projectValid, parents, fileName, "false", null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+
+			result = rest.exists(service, userUUIDValid, projectValid, parents, fileName, null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+		} finally {
+			result = rest.delete(service, userUUIDValid, projectValid, null, parents, null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+		}
+	}
+
+	public void testExistsSuccessNotExists() {
+		String parents = "dir" + UUID.randomUUID().toString() + "test_rest";
+		String invalidName = UUID.randomUUID().toString();
+		try {
+			result = rest.create(service, userUUIDValid, projectValid, null, parents, "true", null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+
+			result = rest.exists(service, userUUIDValid, projectValid, parents, invalidName, null);
+			assertEquals(RESTResultCodes.FILE_DOES_NOT_EXIST, result.getCode());
+		} finally {
+			result = rest.delete(service, userUUIDValid, projectValid, null, parents, null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+		}
+	}
+
+	public void testExistsErrorUserNotAuthorized() {
+		String invalidUUID = UUID.randomUUID().toString();
+		result = rest.exists(service, invalidUUID, projectValid, null, null, null);
+		assertEquals(RESTResultCodes.NOT_AUTHORIZED, result.getCode());
+	}
+
+	public void testExistsErrorProjectNotFound() {
+		result = rest.exists(service, userUUIDValid, projectInvalid, null, null, null);
+		assertEquals(RESTResultCodes.PROJECT_NOT_FOUND, result.getCode());
+	}
+
+	public void testExistsDirectoryNotValid() {
+		String invalidName = UUID.randomUUID().toString();
+		result = rest.exists(service, userUUIDValid, projectValid, invalidName, "file", null);
+		assertEquals(RESTResultCodes.FILE_DOES_NOT_EXIST, result.getCode());
+	}
+
+	public void testExistsErrorNull() {
+		result = rest.exists(service, userUUIDValid, projectValid, null, null, null);
+		assertEquals(RESTResultCodes.OK, result.getCode());
+
+		result = rest.exists(service, null, userUUIDValid, null, null, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.exists(service, null, projectValid, null, null, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.exists(service, null, projectValid, null, null, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.exists(null, null, projectValid, null, null, null);
+		assertEquals(RESTResultCodes.SERVICE_NOT_FOUND, result.getCode());
+	}
+
+	public void testExistsErrorInvalidServiceName() {
+		String invalidServiceName = UUID.randomUUID().toString();
+		result = rest.exists(invalidServiceName, userUUIDValid, projectValid, null, null, null);
+		assertEquals(RESTResultCodes.SERVICE_NOT_FOUND, result.getCode());
+	}
+
+	public void testCreateSuccess() {
+		String parents = "dir" + UUID.randomUUID().toString() + "test_rest";
+		String fileName = "file" + UUID.randomUUID().toString() + "test_rest";
+		try {
+			result = rest.create(service, userUUIDValid, projectValid, null, parents, "true", null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+
+			result = rest.exists(service, userUUIDValid, projectValid, null, parents, null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+
+			result = rest.create(service, userUUIDValid, projectValid, parents, fileName, "false", null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+
+			result = rest.exists(service, userUUIDValid, projectValid, parents, fileName, null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+		} finally {
+			result = rest.delete(service, userUUIDValid, projectValid, null, parents, null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+		}
+	}
+
+	public void testCreateAlreadyExists() {
+		String parents = "dir" + UUID.randomUUID().toString() + "test_rest";
+		String fileName = "file" + UUID.randomUUID().toString() + "test_rest";
+		try {
+			result = rest.create(service, userUUIDValid, projectValid, null, parents, "true", null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+
+			result = rest.exists(service, userUUIDValid, projectValid, null, parents, null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+
+			result = rest.create(service, userUUIDValid, projectValid, null, parents, "true", null);
+			assertEquals(RESTResultCodes.FILE_ALREADY_EXISTS, result.getCode());
+
+			result = rest.create(service, userUUIDValid, projectValid, parents, fileName, "false", null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+
+			result = rest.exists(service, userUUIDValid, projectValid, parents, fileName, null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+
+			result = rest.create(service, userUUIDValid, projectValid, parents, fileName, "false", null);
+			assertEquals(RESTResultCodes.FILE_ALREADY_EXISTS, result.getCode());
+		} finally {
+			result = rest.delete(service, userUUIDValid, projectValid, null, parents, null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+		}
+	}
+
+	public void testCreateErrorProjectDoesNotExist() {
+		String parents = "dir" + UUID.randomUUID().toString() + "test_rest";
+		String fileName = "file" + UUID.randomUUID().toString() + "test_rest";
+		result = rest.create(service, userUUIDValid, projectInvalid, parents, fileName, "false", null);
+		assertEquals(RESTResultCodes.PROJECT_NOT_FOUND, result.getCode());
+	}
+
+	public void testCreateErrorUserNotAuthorized() {
+		String invalidUUID = UUID.randomUUID().toString();
+		String fileName = "file" + UUID.randomUUID().toString() + "test_rest";
+		result = rest.create(service, invalidUUID, projectValid, null, fileName, "false", null);
+		assertEquals(RESTResultCodes.NOT_AUTHORIZED, result.getCode());
+
+		result = rest.create(service, invalidUUID, projectValid, null, fileName, "false", null);
+		assertEquals(RESTResultCodes.NOT_AUTHORIZED, result.getCode());
+	}
+
+	public void testCreateErrorNull() {
+		String parents = "dir" + UUID.randomUUID().toString() + "test_rest";
+		String fileName = "file" + UUID.randomUUID().toString() + "test_rest";
+		try {
+			result = rest.create(service, userUUIDValid, projectValid, null, parents, "true", null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+
+			result = rest.exists(service, userUUIDValid, projectValid, null, parents, null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+
+			result = rest.create(service, userUUIDValid, projectValid, parents, fileName, null, null);
+			assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+			result = rest.create(service, userUUIDValid, projectValid, parents, null, "false", null);
+			assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+			result = rest.create(service, userUUIDValid, projectValid, parents, null, null, null);
+			assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+			result = rest.create(null, userUUIDValid, projectValid, parents, null, null, null);
+			assertEquals(RESTResultCodes.SERVICE_NOT_FOUND, result.getCode());
+
+			result = rest.exists(service, userUUIDValid, projectValid, parents, fileName, null);
+			assertEquals(RESTResultCodes.FILE_DOES_NOT_EXIST, result.getCode());
+		} finally {
+			result = rest.delete(service, userUUIDValid, projectValid, null, parents, null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+		}
+	}
+
+	public void testCreateErrorInvalidServiceName() {
+		String invalidServiceName = UUID.randomUUID().toString();
+		result = rest.create(invalidServiceName, userUUIDValid, projectValid, "", "", "true", null);
+		assertEquals(RESTResultCodes.SERVICE_NOT_FOUND, result.getCode());
+	}
+
+	public void testDeleteSuccess() {
+		String parents = "dir" + UUID.randomUUID().toString() + "test_rest";
+		String fileName = "file" + UUID.randomUUID().toString() + "test_rest";
+		try {
+			result = rest.create(service, userUUIDValid, projectValid, null, parents, "true", null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+
+			result = rest.create(service, userUUIDValid, projectValid, parents, fileName, "false", null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+
+			result = rest.delete(service, userUUIDValid, projectValid, parents, fileName, null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+
+			result = rest.exists(service, userUUIDValid, projectValid, parents, fileName, null);
+			assertEquals(RESTResultCodes.FILE_DOES_NOT_EXIST, result.getCode());
+		} finally {
+			result = rest.delete(service, userUUIDValid, projectValid, null, parents, null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+
+			result = rest.exists(service, userUUIDValid, projectValid, null, parents, null);
+			assertEquals(RESTResultCodes.FILE_DOES_NOT_EXIST, result.getCode());
+		}
+	}
+
+	public void testDeleteErrorUserNotAuthorized() {
+		String invalidUUID = UUID.randomUUID().toString();
+		String fileName = "file" + UUID.randomUUID().toString() + "test_rest";
+		result = rest.delete(service, invalidUUID, projectValid, null, fileName, null);
+		assertEquals(RESTResultCodes.NOT_AUTHORIZED, result.getCode());
+	}
+
+	public void testDeleteErrorProjectNotFound() {
+		String fileName = "file" + UUID.randomUUID().toString() + "test_rest";
+		result = rest.delete(service, userUUIDValid, projectInvalid, null, fileName, null);
+		assertEquals(RESTResultCodes.PROJECT_NOT_FOUND, result.getCode());
+	}
+
+	public void testDeleteErrorNotExists() {
+		String parents = "dir" + UUID.randomUUID().toString() + "test_rest";
+		String fileName = "file" + UUID.randomUUID().toString() + "test_rest";
+		try {
+			result = rest.create(service, userUUIDValid, projectValid, null, parents, "true", null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+
+			result = rest.delete(service, userUUIDValid, projectValid, parents, fileName, null);
+			assertEquals(RESTResultCodes.FILE_DOES_NOT_EXIST, result.getCode());
+		} finally {
+			result = rest.delete(service, userUUIDValid, projectValid, null, parents, null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+		}
+	}
+
+	public void testDeleteErrorNull() {
+		String parents = "dir" + UUID.randomUUID().toString() + "test_rest";
+		String file = "file" + UUID.randomUUID().toString() + "test_rest";
+
+		result = rest.delete(service, userUUIDValid, projectValid, parents, null, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.delete(service, userUUIDValid, projectValid, null, null, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.delete(service, null, userUUIDValid, parents, file, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.delete(service, null, userUUIDValid, parents, null, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.delete(service, null, userUUIDValid, null, file, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.delete(service, null, userUUIDValid, null, null, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.delete(service, null, projectValid, parents, file, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.delete(service, null, projectValid, parents, null, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.delete(service, null, projectValid, null, file, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.delete(service, null, projectValid, null, null, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.delete(service, null, null, parents, file, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.delete(service, null, null, parents, null, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.delete(service, null, null, null, file, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.delete(service, null, null, null, null, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.delete(null, null, null, null, null, null);
+		assertEquals(RESTResultCodes.SERVICE_NOT_FOUND, result.getCode());
+	}
+
+	public void testDeleteErrorInvalidServiceName() {
+		String invalidServiceName = UUID.randomUUID().toString();
+		result = rest.delete(invalidServiceName, userUUIDValid, projectValid, "", "", null);
+		assertEquals(RESTResultCodes.SERVICE_NOT_FOUND, result.getCode());
+	}
+
+	public void testMoveSuccess() {
+		String parentsFrom = "dir" + UUID.randomUUID().toString() + "test_rest";
+		String parentsTo = "dir" + UUID.randomUUID().toString() + "test_rest";
+		String fileName = "file" + UUID.randomUUID().toString() + "test_rest";
+		try {
+			result = rest.create(service, userUUIDValid, projectValid, null, parentsFrom, "true", null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+
+			result = rest.create(service, userUUIDValid, projectValid, null, parentsTo, "true", null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+
+			result = rest.create(service, userUUIDValid, projectValid, parentsFrom, fileName, "false", null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+
+			result = rest.move(service, userUUIDValid, projectValid, parentsTo, parentsFrom, fileName, null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+
+			result = rest.exists(service, userUUIDValid, projectValid, parentsTo, fileName, null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+
+			result = rest.exists(service, userUUIDValid, projectValid, parentsFrom, fileName, null);
+			assertEquals(RESTResultCodes.FILE_DOES_NOT_EXIST, result.getCode());
+		} finally {
+			result = rest.delete(service, userUUIDValid, projectValid, null, parentsFrom, null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+
+			result = rest.delete(service, userUUIDValid, projectValid, null, parentsTo, null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+		}
+	}
+
+	public void testMoveErrorUserNotAuthorized() {
+		String invalidUUID = UUID.randomUUID().toString();
+		String fileName = "file" + UUID.randomUUID().toString() + "test_rest";
+
+		result = rest.move(service, invalidUUID, projectValid, null, null, fileName, null);
+		assertEquals(RESTResultCodes.NOT_AUTHORIZED, result.getCode());
+	}
+
+	public void testMoveErrorFileNotFound() {
+		String fileName = "file" + UUID.randomUUID().toString() + "test_rest";
+		result = rest.move(service, userUUIDValid, projectValid, null, null, fileName, null);
+		assertEquals(RESTResultCodes.FILE_DOES_NOT_EXIST, result.getCode());
+	}
+
+	public void testMoveProjectNotFound() {
+		String fileName = "file" + UUID.randomUUID().toString() + "test_rest";
+		result = rest.move(service, userUUIDValid, projectInvalid, null, null, fileName, null);
+		assertEquals(RESTResultCodes.PROJECT_NOT_FOUND, result.getCode());
+	}
+
+	public void testMoveErrorNull() {
+		String fileName = "file" + UUID.randomUUID().toString() + "test_rest";
+
+		result = rest.move(service, userUUIDValid, projectInvalid, null, null, null, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.move(service, null, userUUIDValid, null, null, fileName, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.move(service, null, userUUIDValid, null, null, null, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.move(service, null, projectInvalid, null, null, fileName, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.move(service, null, null, null, null, fileName, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.move(service, null, null, null, null, null, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.move(null, null, null, null, null, null, null);
+		assertEquals(RESTResultCodes.SERVICE_NOT_FOUND, result.getCode());
+	}
+
+	public void testMoveErrorInvalidServiceName() {
+		String invalidServiceName = UUID.randomUUID().toString();
+		result = rest.move(invalidServiceName, userUUIDValid, projectValid, "", "", "", null);
+		assertEquals(RESTResultCodes.SERVICE_NOT_FOUND, result.getCode());
+	}
+
+	public void testUploadSuccess() {
+		String parents = "dir" + UUID.randomUUID().toString() + "test_rest";
+		try {
+			File file = File.createTempFile("file_test_rest_temp", ".txt");
+
+			BufferedWriter out = new BufferedWriter(new FileWriter(file));
+			out.write("0 1\n0 2\n0 3\n0 4\n0 5\n");
+			out.close();
+
+			result = rest.create(service, userUUIDValid, projectValid, null, parents, "true", null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+
+			result = rest.upload(service, userUUIDValid, projectValid, parents, new FileInputStream(file), new FormDataContentDisposition("form-data", "file", file.getName(), null, null, null, 1000) {}, "true", null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+
+			result = rest.exists(service, userUUIDValid, projectValid, parents, file.getName(), null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+		} catch (IOException e) {
+			assertTrue(false);
+		} finally {
+			result = rest.delete(service, userUUIDValid, projectValid, null, parents, null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+		}
+	}
+
+	public void testUploadErrorUserNotAuthorized() {
+		String parents = "dir" + UUID.randomUUID().toString() + "test_rest";
+		String invalidUUID = UUID.randomUUID().toString();
+		try {
+			File file = File.createTempFile("file_test_rest_temp", ".txt");
+
+			BufferedWriter out = new BufferedWriter(new FileWriter(file));
+			out.write("0 1\n0 2\n0 3\n0 4\n0 5\n");
+			out.close();
+
+			result = rest.create(service, userUUIDValid, projectValid, null, parents, "true", null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+
+			result = rest.upload(service, invalidUUID, projectValid, parents, new FileInputStream(file), new FormDataContentDisposition("form-data", "file", file.getName(), null, null, null, 1000) {}, "true", null);
+			assertEquals(RESTResultCodes.NOT_AUTHORIZED, result.getCode());
+
+			result = rest.exists(service, userUUIDValid, projectValid, parents, file.getName(), null);
+			assertEquals(RESTResultCodes.FILE_DOES_NOT_EXIST, result.getCode());
+
+		} catch (IOException e) {
+			assertTrue(false);
+		} finally {
+			result = rest.delete(service, userUUIDValid, projectValid, null, parents, null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+		}
+	}
+
+	public void testUploadErrorProjectNotFound() {
+		String parents = "dir" + UUID.randomUUID().toString() + "test_rest";
+		try {
+			File file = File.createTempFile("file_test_rest_temp", ".txt");
+
+			BufferedWriter out = new BufferedWriter(new FileWriter(file));
+			out.write("0 1\n0 2\n0 3\n0 4\n0 5\n");
+			out.close();
+
+			result = rest.create(service, userUUIDValid, projectValid, null, parents, "true", null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+
+			result = rest.upload(service, userUUIDValid, projectInvalid, parents, new FileInputStream(file), new FormDataContentDisposition("form-data", "file", file.getName(), null, null, null, 1000) {}, "true", null);
+			assertEquals(RESTResultCodes.PROJECT_NOT_FOUND, result.getCode());
+		} catch (IOException e) {
+			assertTrue(false);
+		} finally {
+			result = rest.delete(service, userUUIDValid, projectValid, null, parents, null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+		}
+	}
+
+	public void testUploadErrorNull() {
+		try {
+			String parents = "dir" + UUID.randomUUID().toString() + "test_rest";
+
+			File file = File.createTempFile("file_test_rest_temp", ".txt");
+
+			BufferedWriter out = new BufferedWriter(new FileWriter(file));
+			out.write("0 1\n0 2\n0 3\n0 4\n0 5\n");
+			out.close();
+
+			result = rest.upload(service, userUUIDValid, projectValid, parents, new FileInputStream(file), new FormDataContentDisposition("form-data", "file", file.getName(), null, null, null, 1000) {}, null, null);
+			assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+			result = rest.upload(service, userUUIDValid, projectValid, parents, new FileInputStream(file), null, "true", null);
+			assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+			result = rest.upload(service, userUUIDValid, projectValid, parents, new FileInputStream(file), null, null, null);
+			assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+			result = rest.upload(service, userUUIDValid, projectValid, parents, null, new FormDataContentDisposition("form-data", "file", file.getName(), null, null, null, 1000) {}, "true", null);
+			assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+			result = rest.upload(service, userUUIDValid, projectValid, parents, null, new FormDataContentDisposition("form-data", "file", file.getName(), null, null, null, 1000) {}, null, null);
+			assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+			result = rest.upload(service, userUUIDValid, projectValid, parents, null, null, "true", null);
+			assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+			result = rest.upload(service, userUUIDValid, projectValid, parents, null, null, null, null);
+			assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+			result = rest.upload(service, null, userUUIDValid, parents, null, null, null, null);
+			assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+			result = rest.upload(service, null, projectValid, parents, null, null, null, null);
+			assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+			result = rest.upload(null, null, projectValid, parents, null, null, null, null);
+			assertEquals(RESTResultCodes.SERVICE_NOT_FOUND, result.getCode());
+		} catch (IOException e) {
+			assertTrue(false);
+		}
+	}
+
+	public void testUploadErrorInvalidServiceName() {
+		String invalidServiceName = UUID.randomUUID().toString();
+		result = rest.upload(invalidServiceName, userUUIDValid, projectValid, "", null, null, "true", null);
+		assertEquals(RESTResultCodes.SERVICE_NOT_FOUND, result.getCode());
+	}
+
+	public void testDownloadSuccess() {
+		String parents = "dir" + UUID.randomUUID().toString() + "test_rest";
+		try {
+			File file = File.createTempFile("file_test_rest_temp", ".txt");
+
+			BufferedWriter out = new BufferedWriter(new FileWriter(file));
+			out.write("0 1\n0 2\n0 3\n0 4\n0 5\n");
+			out.close();
+
+			result = rest.create(service, userUUIDValid, projectValid, null, parents, "true", null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+
+			result = rest.upload(service, userUUIDValid, projectValid, parents, new FileInputStream(file), new FormDataContentDisposition("form-data", "file", file.getName(), null, null, null, 1000) {}, "true", null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+
+			Response response = rest.download(service, userUUIDValid, projectValid, parents, file.getName(), null);
+			assertEquals(RESTResultCodes.OK, response.getStatus());
+		} catch (IOException e) {
+			e.printStackTrace();
+			assertTrue(false);
+		} finally {
+			result = rest.delete(service, userUUIDValid, projectValid, null, parents, null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+		}
+	}
+
+	public void testDownloadErrorFileNotFound() {
+		String parents = "dir" + UUID.randomUUID().toString() + "test_rest";
+		try {
+			File file = File.createTempFile("file_test_rest_temp", ".txt");
+
+			Response response = rest.download(service, userUUIDValid, projectValid, parents, file.getName(), null);
+			assertEquals(RESTResultCodes.NO_CONTENT, response.getStatus());
+		} catch (IOException e) {
+			e.printStackTrace();
+			assertTrue(false);
+		}
+	}
+
+	public void testDownloadErrorNull() {
+		String parents = "dir" + UUID.randomUUID().toString() + "test_rest";
+		String fileName = "file" + UUID.randomUUID().toString() + "test_rest";
+
+		Response response = rest.download(service, userUUIDValid, projectValid, parents, null, null);
+		assertEquals(RESTResultCodes.NO_CONTENT, response.getStatus());
+
+		response = rest.download(service, null, userUUIDValid, parents, fileName, null);
+		assertEquals(RESTResultCodes.NO_CONTENT, response.getStatus());
+
+		response = rest.download(service, null, projectValid, parents, fileName, null);
+		assertEquals(RESTResultCodes.NO_CONTENT, response.getStatus());
+
+		response = rest.download(null, null, projectValid, parents, fileName, null);
+		assertEquals(RESTResultCodes.NO_CONTENT, response.getStatus());
+	}
+
+	public void testDownloadErrorInvalidServiceName() {
+		String invalidServiceName = UUID.randomUUID().toString();
+		Response response = rest.download(invalidServiceName, userUUIDValid, projectValid, "", "true", null);
+		assertEquals(RESTResultCodes.NO_CONTENT, response.getStatus());
+	}
+
+	public void testCopySuccess() {
+		String parentsFrom = "dir" + UUID.randomUUID().toString() + "test_rest";
+		String parentsTo = "dir" + UUID.randomUUID().toString() + "test_rest";
+		String fileName = "file" + UUID.randomUUID().toString() + "test_rest";
+		try {
+			result = rest.create(service, userUUIDValid, projectValid, null, parentsFrom, "true", null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+
+			result = rest.create(service, userUUIDValid, projectValid, null, parentsTo, "true", null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+
+			result = rest.create(service, userUUIDValid, projectValid, parentsFrom, fileName, "false", null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+
+			result = rest.copy(service, userUUIDValid, projectValid, (parentsFrom + "/" + fileName), (parentsTo + "/" + fileName), null);
+			assertEquals(result, new Result(RESTResultCodes.OK));
+
+			result = rest.exists(service, userUUIDValid, projectValid, parentsFrom, fileName, null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+
+			result = rest.exists(service, userUUIDValid, projectValid, parentsTo, fileName, null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+		} finally {
+			result = rest.delete(service, userUUIDValid, projectValid, null, parentsFrom, null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+
+			result = rest.delete(service, userUUIDValid, projectValid, null, parentsTo, null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+		}
+	}
+
+	public void testCopyErrorUserNotAuthorized() {
+		String invalidUUID = UUID.randomUUID().toString();
+		result = rest.copy(service, invalidUUID, projectValid, null, null, null);
+		assertEquals(RESTResultCodes.NOT_AUTHORIZED, result.getCode());
+	}
+
+	public void testCopyErrorFileNotFound() {
+		String parentsFrom = "dir" + UUID.randomUUID().toString() + "test_rest";
+		String parentsTo = "dir" + UUID.randomUUID().toString() + "test_rest";
+		String fileName = "file" + UUID.randomUUID().toString() + "test_rest";
+		try {
+			result = rest.create(service, userUUIDValid, projectValid, null, parentsFrom, "true", null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+
+			result = rest.create(service, userUUIDValid, projectValid, null, parentsTo, "true", null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+
+			result = rest.copy(service, userUUIDValid, projectValid, parentsFrom + "/" + fileName, parentsTo + "/" + fileName, null);
+			assertEquals(result, new Result(RESTResultCodes.FILE_DOES_NOT_EXIST));
+		} finally {
+			result = rest.delete(service, userUUIDValid, projectValid, null, parentsFrom, null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+
+			result = rest.delete(service, userUUIDValid, projectValid, null, parentsTo, null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+		}
+	}
+
+	public void testCopyErrorProjectNotFound() {
+		String fileName = "file" + UUID.randomUUID().toString() + "test_rest";
+		result = rest.copy(service, userUUIDValid, projectInvalid, "/" + fileName, "/" + fileName, null);
+		assertEquals(RESTResultCodes.PROJECT_NOT_FOUND, result.getCode());
+	}
+
+	public void testCopyErrorNull() {
+		String fileName = "file" + UUID.randomUUID().toString() + "test_rest";
+		result = rest.copy(service, null, projectValid, "/" + fileName, "/" + fileName, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.copy(service, null, userUUIDValid, "/" + fileName, "/" + fileName, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.copy(service, null, null, "/" + fileName, "/" + fileName, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.copy(null, null, null, "/" + fileName, "/" + fileName, null);
+		assertEquals(RESTResultCodes.SERVICE_NOT_FOUND, result.getCode());
+	}
+
+	public void testCopyErrorInvalidServiceName() {
+		String invalidServiceName = UUID.randomUUID().toString();
+		result = rest.copy(invalidServiceName, userUUIDValid, projectValid, "", "", null);
+		assertEquals(RESTResultCodes.SERVICE_NOT_FOUND, result.getCode());
+	}
+
+	public void testFindSuccess() {
+		String parents = "dir" + UUID.randomUUID().toString() + "test_rest";
+		String fileName = "file" + UUID.randomUUID().toString() + "test_rest";
+		try {
+			result = rest.create(service, userUUIDValid, projectValid, null, parents, "true", null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+
+			result = rest.create(service, userUUIDValid, projectValid, parents, fileName, "false", null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+
+			FileResult info = rest.find(service, userUUIDValid, projectValid, parents, fileName, null);
+			assertEquals(RESTResultCodes.OK, info.getCode());
+
+			info = rest.find(service, userUUIDValid, projectValid, null, null, null);
+			assertEquals(RESTResultCodes.OK, info.getCode());
+
+			info = rest.find(service, userUUIDValid, projectValid, "", "", null);
+			assertEquals(RESTResultCodes.OK, info.getCode());
+		} finally {
+			result = rest.delete(service, userUUIDValid, projectValid, null, parents, null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+		}
+	}
+
+	public void testFindErrorUserNotAuthorized() {
+		String invalidUUID = UUID.randomUUID().toString();
+		result = rest.find(service, invalidUUID, projectValid, null, null, null);
+		assertEquals(RESTResultCodes.NOT_AUTHORIZED, result.getCode());
+	}
+
+	public void testFindErrorFileNotFound() {
+		String parents = "dir" + UUID.randomUUID().toString() + "test_rest";
+		String fileName = "file" + UUID.randomUUID().toString() + "test_rest";
+		try {
+			result = rest.create(service, userUUIDValid, projectValid, null, parents, "true", null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+
+			FileResult info = rest.find(service, userUUIDValid, projectValid, parents, fileName, null);
+			assertNotNull(info);
+		} finally {
+			result = rest.delete(service, userUUIDValid, projectValid, null, parents, null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+		}
+	}
+
+	public void testFindErrorProjectNotFound() {
+		String fileName = "file" + UUID.randomUUID().toString() + "test_rest";
+		FileResult info = rest.find(service, userUUIDValid, projectInvalid, null, fileName, null);
+		assertEquals(RESTResultCodes.PROJECT_NOT_FOUND, info.getCode());
+
+	}
+
+	public void testFindErrorNull() {
+		String fileName = "file" + UUID.randomUUID().toString() + "test_rest";
+		FileResult info = rest.find(service, null, userUUIDValid, null, fileName, null);
+		assertEquals(RESTResultCodes.USER_ERROR, info.getCode());
+
+		info = rest.find(service, null, userUUIDValid, null, fileName, null);
+		assertEquals(RESTResultCodes.USER_ERROR, info.getCode());
+
+		info = rest.find(service, null, projectInvalid, null, fileName, null);
+		assertEquals(RESTResultCodes.USER_ERROR, info.getCode());
+
+		info = rest.find(null, null, projectInvalid, null, fileName, null);
+		assertEquals(RESTResultCodes.SERVICE_NOT_FOUND, info.getCode());
+	}
+
+	public void testFindErrorInvalidServiceName() {
+		String invalidServiceName = UUID.randomUUID().toString();
+		result = rest.find(invalidServiceName, userUUIDValid, projectValid, "", "", null);
+		assertEquals(RESTResultCodes.SERVICE_NOT_FOUND, result.getCode());
+	}
+
+	public void testRenameSuccess() {
+		String parents = "dir" + UUID.randomUUID().toString() + "test_rest";
+		String oldName = "file" + UUID.randomUUID().toString() + "test_rest";
+		String newName = "file" + UUID.randomUUID().toString() + "test_rest";
+		try {
+			result = rest.create(service, userUUIDValid, projectValid, null, parents, "true", null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+
+			result = rest.create(service, userUUIDValid, projectValid, parents, oldName, "false", null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+
+			result = rest.rename(service, userUUIDValid, projectValid, parents, oldName, newName, null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+		} finally {
+			result = rest.delete(service, userUUIDValid, projectValid, null, parents, null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+		}
+	}
+
+	public void testRenameProjectNotFound() {
+		String parents = "dir" + UUID.randomUUID().toString() + "test_rest";
+		String oldName = "file" + UUID.randomUUID().toString() + "test_rest";
+		String newName = "file" + UUID.randomUUID().toString() + "test_rest";
+		try {
+			result = rest.create(service, userUUIDValid, projectValid, null, parents, "true", null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+
+			result = rest.create(service, userUUIDValid, projectValid, parents, oldName, "false", null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+
+			result = rest.rename(service, userUUIDValid, projectInvalid, parents, oldName, newName, null);
+			assertEquals(RESTResultCodes.PROJECT_NOT_FOUND, result.getCode());
+		} finally {
+			result = rest.delete(service, userUUIDValid, projectValid, null, parents, null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+		}
+	}
+
+	public void testRenameFileDoesNotExist() {
+		String parents = "dir" + UUID.randomUUID().toString() + "test_rest";
+		String oldName = "file" + UUID.randomUUID().toString() + "test_rest";
+		String newName = "file" + UUID.randomUUID().toString() + "test_rest";
+		try {
+			result = rest.create(service, userUUIDValid, projectValid, null, parents, "true", null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+
+			result = rest.rename(service, userUUIDValid, projectValid, parents, oldName, newName, null);
+			assertEquals(RESTResultCodes.FILE_DOES_NOT_EXIST, result.getCode());
+		} finally {
+			result = rest.delete(service, userUUIDValid, projectValid, null, parents, null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+		}
+	}
+
+	public void testRenameUserNotAuthorized() {
+		String parents = "dir" + UUID.randomUUID().toString() + "test_rest";
+		String oldName = "file" + UUID.randomUUID().toString() + "test_rest";
+		String newName = "file" + UUID.randomUUID().toString() + "test_rest";
+		String invalidUUID = UUID.randomUUID().toString();
+		try {
+			result = rest.create(service, userUUIDValid, projectValid, null, parents, "true", null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+
+			result = rest.create(service, userUUIDValid, projectValid, parents, oldName, "false", null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+
+			result = rest.rename(service, invalidUUID, projectValid, parents, oldName, newName, null);
+			assertEquals(RESTResultCodes.NOT_AUTHORIZED, result.getCode());
+
+			result = rest.rename(service, "", projectValid, parents, oldName, newName, null);
+			assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+		} finally {
+			result = rest.delete(service, userUUIDValid, projectValid, null, parents, null);
+			assertEquals(RESTResultCodes.OK, result.getCode());
+		}
+	}
+
+	public void testRenameErrorNull() {
+		String parents = "dir" + UUID.randomUUID().toString() + "test_rest";
+		String oldName = "file" + UUID.randomUUID().toString() + "test_rest";
+		String newName = "file" + UUID.randomUUID().toString() + "test_rest";
+
+		result = rest.rename(service, null, projectValid, parents, oldName, newName, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.rename(service, userUUIDValid, projectValid, parents, null, newName, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.rename(service, userUUIDValid, projectValid, parents, oldName, null, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.rename(service, null, userUUIDValid, parents, oldName, newName, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.rename(null, userUUIDValid, null, parents, oldName, newName, null);
+		assertEquals(RESTResultCodes.SERVICE_NOT_FOUND, result.getCode());
+	}
+
+	public void testRenameErrorInvalidServiceName() {
+		String invalidServiceName = UUID.randomUUID().toString();
+		result = rest.rename(invalidServiceName, userUUIDValid, projectValid, "", "", "", null);
+		assertEquals(RESTResultCodes.SERVICE_NOT_FOUND, result.getCode());
+	}
+}

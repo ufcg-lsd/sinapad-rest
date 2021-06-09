@@ -1,0 +1,76 @@
+package br.lncc.sinapad.rest.monitoring;
+
+import java.util.UUID;
+
+import br.lncc.sinapad.rest.RestOperationTest;
+import br.lncc.sinapad.rest.data.ListResourceResult;
+import br.lncc.sinapad.rest.data.ResourceResult;
+import br.lncc.sinapad.rest.utils.RESTResultCodes;
+
+public class ResourceMonitoringRESTOperationTest extends RestOperationTest {
+
+	private ResourceMonitoringRESTOperation rest = new ResourceMonitoringRESTOperation();
+
+	public void testListSuccess() {
+		ListResourceResult results = rest.list(service, userUUIDValid);
+		assertEquals(results.getCode(), RESTResultCodes.OK);
+	}
+
+	public void testListErrorUserNotAuthorized() {
+		String invalidName = UUID.randomUUID().toString();
+		ListResourceResult results = rest.list(service, invalidName);
+		assertEquals(RESTResultCodes.NOT_AUTHORIZED, results.getCode());
+	}
+
+	public void testListErrorNull() {
+		ListResourceResult results = rest.list(service, null);
+		assertEquals(results.getCode(), RESTResultCodes.USER_ERROR);
+
+		results = rest.list(null, null);
+		assertEquals(results.getCode(), RESTResultCodes.SERVICE_NOT_FOUND);
+	}
+
+	public void testListErrorInvalidServiceName() {
+		String invalidServiceName = UUID.randomUUID().toString();
+		ListResourceResult results = rest.list(invalidServiceName, userUUIDValid);
+		assertEquals(results.getCode(), RESTResultCodes.SERVICE_NOT_FOUND);
+	}
+
+	public void testGetSuccess() {
+		ListResourceResult list = rest.list(service, userUUIDValid);
+		ResourceResult resourceResult = list.getElements().get(0);
+		String name = resourceResult.getName();
+		ResourceResult result = rest.get(service, userUUIDValid, name);
+		assertEquals(RESTResultCodes.OK, result.getCode());
+	}
+
+	public void testGetErrorFileDoesNotExist() {
+		String invalidName = UUID.randomUUID().toString();
+		ResourceResult result = rest.get(service, userUUIDValid, invalidName);
+		assertEquals(RESTResultCodes.FILE_DOES_NOT_EXIST, result.getCode());
+	}
+
+	public void testGetErrorUserNotAuthorized() {
+		String invalidName = UUID.randomUUID().toString();
+		ListResourceResult list = rest.list(service, userUUIDValid);
+		ResourceResult single = list.getElements().get(0);
+		String name = single.getName();
+		ResourceResult result = rest.get(service, invalidName, name);
+		assertEquals(RESTResultCodes.NOT_AUTHORIZED, result.getCode());
+	}
+
+	public void testGetNull() {
+		ListResourceResult list = rest.list(service, userUUIDValid);
+		ResourceResult resourceResult = list.getElements().get(0);
+		String name = resourceResult.getName();
+
+		ResourceResult result = rest.get(service, null, userUUIDValid);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.get(service, null, name);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.get(null, null, null);
+		assertEquals(RESTResultCodes.SERVICE_NOT_FOUND, result.getCode());
+	}
+}

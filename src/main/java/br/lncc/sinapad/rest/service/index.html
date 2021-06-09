@@ -1,0 +1,2637 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<script type="text/javascript" src="js/angular.min.js"></script>
+<script type="text/javascript" src="js/app.js"></script>
+<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>SINAPAD REST</title>
+<style type="text/css">
+.fixed {
+	position: fixed;
+	bottom: 2%;
+	right: 15%;
+	width: 120px;
+	z-index: 2
+}
+</style>
+</head>
+<body>
+  <div ng-app="" ng-init="viewExemples=false">
+    <div class="container" id="top">
+      <div class="jumbotron">
+        <h1>SINAPAD REST</h1>
+        <p class="lead">Description of the REST services offered by SINAPAD.</p>
+      </div>
+      <div>
+        <ul class="nav nav-pills">
+          <li role="presentation">
+            <a href="#application" ng-click=viewExemples=false>Application</a>
+          </li>
+          <li role="presentation">
+            <a href="#authentication" ng-click=viewExemples=false>Authentication</a>
+          </li>
+          <li role="presentation">
+            <a href="#file" ng-click=viewExemples=false>File</a>
+          </li>
+          <li role="presentation">
+            <a href="#jobMonitoring" ng-click=viewExemples=false>Job Monitoring</a>
+          </li>
+          <li role="presentation">
+            <a href="#jobSubmission" ng-click=viewExemples=false>Job Submission</a>
+          </li>
+          <li role="presentation">
+            <a href="#resourceMonitoring" ng-click=viewExemples=false>Resource Monitoring</a>
+          </li>
+          <li role="presentation">
+            <a href="#service" ng-click=viewExemples=false>Service</a>
+          </li>
+          <li role="presentation">
+            <a href="#" ng-click=viewExemples=true>Examples</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <br>
+    <div ng-show="!viewExemples">
+      <div class="container">
+        <fieldset class="scheduler-border">
+          <legend class="scheduler-border" id="application">Application REST Services</legend>
+          <div class="list-group">
+            <div class="list-group-item">
+              <h4 class="list-group-item-heading">
+                <a href="test-application-config.jsp" target="_blank">op/application/config</a>
+              </h4>
+              <p class="list-group-item-text">
+              <div class="block">Get the configuration of an specific application given its name and version.</div>
+              </p>
+              <dl>
+                <dt>
+                  <span class="paramLabel">Parameters:</span>
+                </dt>
+                <dd>
+                  <code>service</code>
+                  - The service name.
+                </dd>
+                <dd>
+                  <code>uuid</code>
+                  - Universally unique identifier of the user.
+                </dd>
+                <dd>
+                  <code>application</code>
+                  - The name of the application.
+                </dd>
+                <dd>
+                  <code>version</code>
+                  - The version of the application.
+                </dd>
+                <dt>
+                  <span class="returnLabel">Returns:</span>
+                </dt>
+                <dd>
+                  A streaming representing the application configuration file.
+                  <br>
+                  <code>OK</code>
+                  - if the file download was successful;
+                  <br>
+                  <code>NO_CONTENT</code>
+                  - if the file was not found or some error occur;
+                  <br>
+                </dd>
+                <a href="codes.jsp">Click to check the code values</a>
+              </dl>
+              <h4 class="text-right">
+                <a href="#top">Back to Top</a>
+              </h4>
+            </div>
+          </div>
+          <div class="list-group">
+            <div class="list-group-item">
+              <h4 class="list-group-item-heading">
+                <a href="test-application-get.jsp" target="_blank">op/application/get</a>
+              </h4>
+              <p class="list-group-item-text">
+              <div class="block">Get an specific application given its name.</div>
+              </p>
+              <dl>
+                <dt>
+                  <span class="paramLabel">Parameters:</span>
+                </dt>
+                <dd>
+                  <code>service</code>
+                  - The service name.
+                </dd>
+                <dd>
+                  <code>uuid</code>
+                  - Universally unique identifier of the user.
+                </dd>
+                <dd>
+                  <code>application</code>
+                  - The name of the application.
+                </dd>
+                <dt>
+                  <span class="returnLabel">Returns:</span>
+                </dt>
+                <dd>
+                  A result containing the application and the code of the result.
+                  <br>
+                  <code>NOT_AUTHORIZED</code>
+                  - when the user is not authorized to perform an operation;
+                  <br>
+                  <code>OK</code>
+                  - if the application was found;
+                  <br>
+                  <code>USER_ERROR</code>
+                  - if the application inputed is not valid or some required parameter is null;
+                  <br>
+                  <code>SERVICE_NOT_FOUND</code>
+                  - if the service is not valid;
+                  <br>
+                  <code>INTERNAL_SERVER_ERROR</code>
+                  - if some error occurs.
+                </dd>
+                <a href="codes.jsp">Click to check the code values</a>
+              </dl>
+              <h4 class="text-right">
+                <a href="#top">Back to Top</a>
+              </h4>
+            </div>
+          </div>
+          <div class="list-group">
+            <div class="list-group-item">
+              <h4 class="list-group-item-heading">
+                <a href="test-application-list.jsp" target="_blank">op/application/list</a>
+              </h4>
+              <p class="list-group-item-text">
+              <div class="block">List all the applications available for the user.</div>
+              </p>
+              <dl>
+                <dt>
+                  <span class="paramLabel">Parameters:</span>
+                </dt>
+                <dd>
+                  <code>service</code>
+                  - The service name.
+                </dd>
+                <dd>
+                  <code>uuid</code>
+                  - Universally unique identifier of the user.
+                </dd>
+                <dt>
+                  <span class="returnLabel">Returns:</span>
+                </dt>
+                <dd>
+                  A result containing the list of the applications available for the user and the code of the result.
+                  <br>
+                  <code>NOT_AUTHORIZED</code>
+                  - when the user is not authorized to perform an operation;
+                  <br>
+                  <code>OK</code>
+                  - if success;
+                  <br>
+                  <code>SERVICE_NOT_FOUND</code>
+                  - if the service is not valid;
+                  <br>
+                  <code>INTERNAL_SERVER_ERROR</code>
+                  - if some error occurs.
+                </dd>
+                <a href="codes.jsp">Click to check the code values</a>
+              </dl>
+              <h4 class="text-right">
+                <a href="#top">Back to Top</a>
+              </h4>
+            </div>
+          </div>
+        </fieldset>
+      </div>
+      <div class="container">
+        <fieldset class="scheduler-border">
+          <legend class="scheduler-border" id="authentication">Authentication REST Services</legend>
+          <div class="list-group">
+            <div class="list-group-item">
+              <h4 class="list-group-item-heading">
+                <a href="test-authentication-info.jsp" target="_blank">op/authentication/info</a>
+              </h4>
+              <p class="list-group-item-text">
+              <div class="block">Returns some information about the user</div>
+              </p>
+              <dl>
+                <dt>
+                  <span class="paramLabel">Parameters:</span>
+                </dt>
+                <dd>
+                  <code>service</code>
+                  - The service name.
+                </dd>
+                <dd>
+                  <code>uuid</code>
+                  - Universally unique identifier of the user.
+                </dd>
+                <dt>
+                  <span class="returnLabel">Returns:</span>
+                </dt>
+                <dd>
+                  A result containing the code of the result.
+                  <br>
+                  <code>USER_ERROR</code>
+                  - if the uuid is null;
+                  <br>
+                  <code>NOT_AUTHORIZED</code>
+                  - if the user is not logged;
+                  <br>
+                  <code>OK</code>
+                  - if success;
+                  <br>
+                  <code>SERVICE_NOT_FOUND</code>
+                  - if the service is not valid;
+                  <br>
+                  <code>INTERNAL_SERVER_ERROR</code>
+                  - if some error occurs.
+                </dd>
+                <a href="codes.jsp">Click to check the code values</a>
+              </dl>
+              <h4 class="text-right">
+                <a href="#top">Back to Top</a>
+              </h4>
+            </div>
+          </div>
+          <div class="list-group">
+            <div class="list-group-item">
+              <h4 class="list-group-item-heading">
+                <a href="test-authentication-login-ldap.jsp" target="_blank">op/authentication/login-ldap</a>
+              </h4>
+              <p class="list-group-item-text">
+              <div class="block">Authenticate an use given an userName and password.</div>
+              </p>
+              <dl>
+                <dt>
+                  <span class="paramLabel">Parameters:</span>
+                </dt>
+                <dd>
+                  <code>service</code>
+                  - The service name.
+                </dd>
+                <dd>
+                  <code>username</code>
+                  - The name of the user.
+                </dd>
+                <dd>
+                  <code>password</code>
+                  - The password of the user.
+                </dd>
+                <dt>
+                  <span class="returnLabel">Returns:</span>
+                </dt>
+                <dd>
+                  A result containing the uuid of the authenticated user and the code of the result.
+                  <br>
+                  <code>OK</code>
+                  - if success;
+                  <br>
+                  <code>NOT_AUTHORIZED</code>
+                  - when the user is not authorized to perform an operation;
+                  <br>
+                  <code>USER_ERROR</code>
+                  - if username or password is null;
+                  <br>
+                  <code>SERVICE_NOT_FOUND</code>
+                  - if the service is not valid;
+                  <br>
+                  <code>INTERNAL_SERVER_ERROR</code>
+                  - if some error occurs.
+                </dd>
+                <a href="codes.jsp">Click to check the code values</a>
+              </dl>
+              <h4 class="text-right">
+                <a href="#top">Back to Top</a>
+              </h4>
+            </div>
+          </div>
+          <div class="list-group">
+            <div class="list-group-item">
+              <h4 class="list-group-item-heading">
+                <a href="test-authentication-login-rsa.jsp" target="_blank">op/authentication/login-rsa</a>
+              </h4>
+              <p class="list-group-item-text">
+              <div class="block">Authenticate an user given an userName and a certification.</div>
+              </p>
+              <dl>
+                <dt>
+                  <span class="paramLabel">Parameters:</span>
+                </dt>
+                <dd>
+                  <code>service</code>
+                  - The service name.
+                </dd>
+                <dd>
+                  <code>username</code>
+                  - The name of the user.
+                </dd>
+                <dd>
+                  <code>file</code>
+                  - A stream containing the certificate data.
+                </dd>
+                <dt>
+                  <span class="returnLabel">Returns:</span>
+                </dt>
+                <dd>
+                  A result containing the uuid of the authenticated user and the code of the result.
+                  <br>
+                  <code>OK</code>
+                  - if success;
+                  <br>
+                  <code>NOT_AUTHORIZED</code>
+                  - when the user is not authorized to perform an operation;
+                  <br>
+                  <code>USER_ERROR</code>
+                  - if username or password is null;
+                  <br>
+                  <code>SERVICE_NOT_FOUND</code>
+                  - if the service is not valid;
+                  <br>
+                  <code>INTERNAL_SERVER_ERROR</code>
+                  - if some error occurs.
+                </dd>
+                <a href="codes.jsp">Click to check the code values</a>
+              </dl>
+              <h4 class="text-right">
+                <a href="#top">Back to Top</a>
+              </h4>
+            </div>
+          </div>
+          <div class="list-group">
+            <div class="list-group-item">
+              <h4 class="list-group-item-heading">
+                <a href="test-authentication-login-voms.jsp" target="_blank">op/authentication/login-voms</a>
+              </h4>
+              <p class="list-group-item-text">
+              <div class="block">Authenticate an user given an userName and a certification.</div>
+              </p>
+              <dl>
+                <dt>
+                  <span class="paramLabel">Parameters:</span>
+                </dt>
+                <dd>
+                  <code>service</code>
+                  - The service name.
+                </dd>
+                <dd>
+                  <code>file</code>
+                  - A stream containing the certificate data.
+                </dd>
+                <dt>
+                  <span class="returnLabel">Returns:</span>
+                </dt>
+                <dd>
+                  A result containing the uuid of the authenticated user and the code of the result.
+                  <br>
+                  <code>OK</code>
+                  - if success;
+                  <br>
+                  <code>NOT_AUTHORIZED</code>
+                  - when the user is not authorized to perform an operation;
+                  <br>
+                  <code>USER_ERROR</code>
+                  - if username or password is null;
+                  <br>
+                  <code>SERVICE_NOT_FOUND</code>
+                  - if the service is not valid;
+                  <br>
+                  <code>INTERNAL_SERVER_ERROR</code>
+                  - if some error occurs.
+                </dd>
+                <a href="codes.jsp">Click to check the code values</a>
+              </dl>
+              <h4 class="text-right">
+                <a href="#top">Back to Top</a>
+              </h4>
+            </div>
+          </div>
+          <div class="list-group">
+            <div class="list-group-item">
+              <h4 class="list-group-item-heading">
+                <a href="test-authentication-logout.jsp" target="_blank">op/authentication/logout</a>
+              </h4>
+              <p class="list-group-item-text">
+              <div class="block">Logout an user.</div>
+              </p>
+              <dl>
+                <dt>
+                  <span class="paramLabel">Parameters:</span>
+                </dt>
+                <dd>
+                  <code>service</code>
+                  - The service name.
+                </dd>
+                <dd>
+                  <code>uuid</code>
+                  - Universally unique identifier of the user.
+                </dd>
+                <dt>
+                  <span class="returnLabel">Returns:</span>
+                </dt>
+                <dd>
+                  A result containing the code of the result.
+                  <br>
+                  <code>USER_ERROR</code>
+                  - if the uuid is null;
+                  <br>
+                  <code>NOT_AUTHORIZED</code>
+                  - if the user is not logged;
+                  <br>
+                  <code>OK</code>
+                  - if success;
+                  <br>
+                  <code>SERVICE_NOT_FOUND</code>
+                  - if the service is not valid;
+                  <br>
+                  <code>INTERNAL_SERVER_ERROR</code>
+                  - if some error occurs.
+                </dd>
+                <a href="codes.jsp">Click to check the code values</a>
+              </dl>
+              <h4 class="text-right">
+                <a href="#top">Back to Top</a>
+              </h4>
+            </div>
+          </div>
+        </fieldset>
+      </div>
+      <div class="container">
+        <fieldset class="scheduler-border">
+          <legend class="scheduler-border" id="file">File REST Services</legend>
+          <div class="list-group">
+            <div class="list-group-item">
+              <h4 class="list-group-item-heading">
+                <a href="test-file-copy.jsp" target="_blank">op/file/copy</a>
+              </h4>
+              <p class="list-group-item-text">
+              <div class="block">Copies a file.</div>
+              </p>
+              <dl>
+                <dt>
+                  <span class="paramLabel">Parameters:</span>
+                </dt>
+                <dd>
+                  <code>service</code>
+                  - The service name.
+                </dd>
+                <dd>
+                  <code>uuid</code>
+                  - Universally unique identifier of the user.
+                </dd>
+                <dd>
+                  <code>project</code>
+                  - A project owned by the user.
+                </dd>
+                <dd>
+                  <code>source</code>
+                  - The source of the file.
+                </dd>
+                <dd>
+                  <code>destination</code>
+                  - The destination of the copy.
+                </dd>
+                <dd>
+                  <code>skipValidation</code>
+                  - True to skip validation.
+                </dd>
+                <dt>
+                  <span class="returnLabel">Returns:</span>
+                </dt>
+                <dd>
+                  A result containing the code of the result.
+                  <br>
+                  <code>USER_ERROR</code>
+                  - if the uuid or the project is null;
+                  <br>
+                  <code>NOT_AUTHORIZED</code>
+                  - when the user is not authorized to perform an operation;
+                  <br>
+                  <code>PROJECT_NOT_FOUND</code>
+                  - if the project is not found;
+                  <br>
+                  <code>OK</code>
+                  - if success;
+                  <br>
+                  <code>FILE_DOES_NOT_EXIST</code>
+                  - if the file does not exist;
+                  <br>
+                  <code>SERVICE_NOT_FOUND</code>
+                  - if the service is not valid;
+                  <br>
+                  <code>INTERNAL_SERVER_ERROR</code>
+                  - if some error occurs.
+                </dd>
+                <a href="codes.jsp">Click to check the code values</a>
+              </dl>
+              <h4 class="text-right">
+                <a href="#top">Back to Top</a>
+              </h4>
+            </div>
+          </div>
+          <div class="list-group">
+            <div class="list-group-item">
+              <h4 class="list-group-item-heading">
+                <a href="test-file-create.jsp" target="_blank">op/file/create</a>
+              </h4>
+              <p class="list-group-item-text">
+              <div class="block">Creates a new file or directory.</div>
+              </p>
+              <dl>
+                <dt>
+                  <span class="paramLabel">Parameters:</span>
+                </dt>
+                <dd>
+                  <code>service</code>
+                  - The service name.
+                </dd>
+                <dd>
+                  <code>uuid</code>
+                  - Universally unique identifier of the user.
+                </dd>
+                <dd>
+                  <code>project</code>
+                  - A project owned by the user.
+                </dd>
+                <dd>
+                  <code>parents</code>
+                  - (optional) The parents directory. Null if there is no parents. Parents are separated using the '/' character.
+                </dd>
+                <dd>
+                  <code>file</code>
+                  - The file name.
+                </dd>
+                <dd>
+                  <code>directory</code>
+                  - True if it is a directory or false if it is a file.
+                </dd>
+                <dd>
+                  <code>skipValidation</code>
+                  - True to skip validation.
+                </dd>
+                <dt>
+                  <span class="returnLabel">Returns:</span>
+                </dt>
+                <dd>
+                  A result containing the code of the result.
+                  <br>
+                  <code>USER_ERROR</code>
+                  - if some required parameter is null;
+                  <br>
+                  <code>NOT_AUTHORIZED</code>
+                  - when the user is not authorized to perform an operation;
+                  <br>
+                  <code>PROJECT_NOT_FOUND</code>
+                  - if the project is not found;
+                  <br>
+                  <code>OK</code>
+                  - if success;
+                  <br>
+                  <code>FILE_ALREADY_EXISTS</code>
+                  - if the file already exists;
+                  <br>
+                  <code>SERVICE_NOT_FOUND</code>
+                  - if the service is not valid;
+                  <br>
+                  <code>INTERNAL_SERVER_ERROR</code>
+                  - if some error occurs.
+                </dd>
+                <a href="codes.jsp">Click to check the code values</a>
+              </dl>
+              <h4 class="text-right">
+                <a href="#top">Back to Top</a>
+              </h4>
+            </div>
+          </div>
+          <div class="list-group">
+            <div class="list-group-item">
+              <h4 class="list-group-item-heading">
+                <a href="test-file-delete.jsp" target="_blank">op/file/delete</a>
+              </h4>
+              <p class="list-group-item-text">
+              <div class="block">Deletes a file or directory.</div>
+              </p>
+              <dl>
+                <dt>
+                  <span class="paramLabel">Parameters:</span>
+                </dt>
+                <dd>
+                  <code>service</code>
+                  - The service name.
+                </dd>
+                <dd>
+                  <code>uuid</code>
+                  - Universally unique identifier of the user.
+                </dd>
+                <dd>
+                  <code>project</code>
+                  - A project owned by the user.
+                </dd>
+                <dd>
+                  <code>parents</code>
+                  - (optional) The parents directory. Null if there is no parents. Parents are separated using the '/' character.
+                </dd>
+                <dd>
+                  <code>file</code>
+                  - The file name.
+                </dd>
+                <dd>
+                  <code>skipValidation</code>
+                  - True to skip validation.
+                </dd>
+                <dt>
+                  <span class="returnLabel">Returns:</span>
+                </dt>
+                <dd>
+                  A result containing the code of the result.
+                  <br>
+                  <code>USER_ERROR</code>
+                  - if some required parameter is null;
+                  <br>
+                  <code>NOT_AUTHORIZED</code>
+                  - when the user is not authorized to perform an operation;
+                  <br>
+                  <code>PROJECT_NOT_FOUND</code>
+                  - if the project is not found;
+                  <br>
+                  <code>OK</code>
+                  - if success;
+                  <br>
+                  <code>FILE_DOES_NOT_EXIST</code>
+                  - if the file does not exist;
+                  <br>
+                  <code>SERVICE_NOT_FOUND</code>
+                  - if the service is not valid;
+                  <br>
+                  <code>INTERNAL_SERVER_ERROR</code>
+                  - if some error occurs.
+                </dd>
+                <a href="codes.jsp">Click to check the code values</a>
+              </dl>
+              <h4 class="text-right">
+                <a href="#top">Back to Top</a>
+              </h4>
+            </div>
+          </div>
+          <div class="list-group">
+            <div class="list-group-item">
+              <h4 class="list-group-item-heading">
+                <a href="test-file-download.jsp" target="_blank">op/file/download</a>
+              </h4>
+              <p class="list-group-item-text">
+              <div class="block">Downloads a file.</div>
+              </p>
+              <dl>
+                <dt>
+                  <span class="paramLabel">Parameters:</span>
+                </dt>
+                <dd>
+                  <code>service</code>
+                  - The service name.
+                </dd>
+                <dd>
+                  <code>uuid</code>
+                  - Universally unique identifier of the user.
+                </dd>
+                <dd>
+                  <code>project</code>
+                  - A project owned by the user.
+                </dd>
+                <dd>
+                  <code>parents</code>
+                  - (optional) The parents directory. Null if there is no parents. Parents are separated using the '/' character.
+                </dd>
+                <dd>
+                  <code>file</code>
+                  - The file name.
+                </dd>
+                <dd>
+                  <code>skipValidation</code>
+                  - True to skip validation. 
+                  NOTES: If you are trying to download a directory, you can not skip validation.
+                </dd>
+                <dt>
+                  <span class="returnLabel">Returns:</span>
+                </dt>
+                <dd>
+                  A streaming for download the file and a result containing the code of the result.
+                  <br>
+                  <code>OK</code>
+                  - if success;
+                  <br>
+                  <code>NO_CONTENT</code>
+                  - if the file was not found;
+                  <br>
+                </dd>
+                <a href="codes.jsp">Click to check the code values</a>
+              </dl>
+              <h4 class="text-right">
+                <a href="#top">Back to Top</a>
+              </h4>
+            </div>
+          </div>
+          <div class="list-group">
+            <div class="list-group-item">
+              <h4 class="list-group-item-heading">
+                <a href="test-file-exists.jsp" target="_blank">op/file/exists</a>
+              </h4>
+              <p class="list-group-item-text">
+              <div class="block">Checks if a file exists.</div>
+              </p>
+              <dl>
+                <dt>
+                  <span class="paramLabel">Parameters:</span>
+                </dt>
+                <dd>
+                  <code>service</code>
+                  - The service name.
+                </dd>
+                <dd>
+                  <code>uuid</code>
+                  - Universally unique identifier of the user.
+                </dd>
+                <dd>
+                  <code>project</code>
+                  - A project owned by the user.
+                </dd>
+                <dd>
+                  <code>parents</code>
+                  - (optional) The parents directory. Null if there is no parents. Parents are separated using the '/' character.
+                </dd>
+                <dd>
+                  <code>file</code>
+                  - (optional) The file name. Null if there is not file name.
+                </dd>
+                <dd>
+                  <code>skipValidation</code>
+                  - True to skip validation.
+                </dd>
+                <dt>
+                  <span class="returnLabel">Returns:</span>
+                </dt>
+                <dd>
+                  A result containing the code of the result.
+                  <br>
+                  <code>USER_ERROR</code>
+                  - if the uuid or the project is null;
+                  <br>
+                  <code>NOT_AUTHORIZED</code>
+                  - when the user is not authorized to perform an operation;
+                  <br>
+                  <code>PROJECT_NOT_FOUND</code>
+                  - if the project is not found;
+                  <br>
+                  <code>OK</code>
+                  - if success;
+                  <br>
+                  <code>FILE_DOES_NOT_EXIST</code>
+                  - if the file does not exist;
+                  <br>
+                  <code>SERVICE_NOT_FOUND</code>
+                  - if the service is not valid;
+                  <br>
+                  <code>INTERNAL_SERVER_ERROR</code>
+                  - if some error occurs.
+                </dd>
+                <a href="codes.jsp">Click to check the code values</a>
+              </dl>
+              <h4 class="text-right">
+                <a href="#top">Back to Top</a>
+              </h4>
+            </div>
+          </div>
+          <div class="list-group">
+            <div class="list-group-item">
+              <h4 class="list-group-item-heading">
+                <a href="test-file-find.jsp" target="_blank">op/file/find</a>
+              </h4>
+              <p class="list-group-item-text">
+              <div class="block">Finds a file representation.</div>
+              </p>
+              <dl>
+                <dt>
+                  <span class="paramLabel">Parameters:</span>
+                </dt>
+                <dd>
+                  <code>service</code>
+                  - The service name.
+                </dd>
+                <dd>
+                  <code>uuid</code>
+                  - Universally unique identifier of the user.
+                </dd>
+                <dd>
+                  <code>project</code>
+                  - A project owned by the user.
+                </dd>
+                <dd>
+                  <code>parents</code>
+                  - (optional) The parents directory. Null if there is no parents. Parents are separated using the '/' character.
+                </dd>
+                <dd>
+                  <code>file</code>
+                  - (optional) The file name. Null if there is not file name.
+                </dd>
+                <dd>
+                  <code>skipValidation</code>
+                  - True to skip validation.
+                </dd>
+                <dt>
+                  <span class="returnLabel">Returns:</span>
+                </dt>
+                <dd>
+                  A result containing the file information and the code of the result.
+                  <br>
+                  <code>USER_ERROR</code>
+                  - if the uuid or the project is null;
+                  <br>
+                  <code>NOT_AUTHORIZED</code>
+                  - when the user is not authorized to perform an operation;
+                  <br>
+                  <code>PROJECT_NOT_FOUND</code>
+                  - if the project is not found;
+                  <br>
+                  <code>OK</code>
+                  - if success;
+                  <br>
+                  <code>FILE_DOES_NOT_EXIST</code>
+                  - if the file does not exist;
+                  <br>
+                  <code>SERVICE_NOT_FOUND</code>
+                  - if the service is not valid;
+                  <br>
+                  <code>INTERNAL_SERVER_ERROR</code>
+                  - if some error occurs.
+                </dd>
+                <a href="codes.jsp">Click to check the code values</a>
+              </dl>
+              <h4 class="text-right">
+                <a href="#top">Back to Top</a>
+              </h4>
+            </div>
+          </div>
+          <div class="list-group">
+            <div class="list-group-item">
+              <h4 class="list-group-item-heading">
+                <a href="test-file-move.jsp" target="_blank">op/file/move</a>
+              </h4>
+              <p class="list-group-item-text">
+              <div class="block">Moves a file.</div>
+              </p>
+              <dl>
+                <dt>
+                  <span class="paramLabel">Parameters:</span>
+                </dt>
+                <dd>
+                  <code>service</code>
+                  - The service name.
+                </dd>
+                <dd>
+                  <code>uuid</code>
+                  - Universally unique identifier of the user.
+                </dd>
+                <dd>
+                  <code>project</code>
+                  - A project owned by the user.
+                </dd>
+                <dd>
+                  <code>parentsFrom</code>
+                  - (optional) The parents directory where the file is. Null if there is no parents. Parents are separated using the '/' character.
+                </dd>
+                <dd>
+                  <code>fileName</code>
+                  - The name of the file.
+                </dd>
+                <dd>
+                  <code>parentsTo</code>
+                  - (optional) The parents directory where the file will be placed. Null if there is no parents. Parents are separated using the '/' character.
+                </dd>
+                <dd>
+                  <code>skipValidation</code>
+                  - True to skip validation.
+                </dd>
+                <dt>
+                  <span class="returnLabel">Returns:</span>
+                </dt>
+                <dd>
+                  A result containing the code of the result.
+                  <br>
+                  <code>USER_ERROR</code>
+                  - if the uuid or the project is null;
+                  <br>
+                  <code>NOT_AUTHORIZED</code>
+                  - when the user is not authorized to perform an operation;
+                  <br>
+                  <code>PROJECT_NOT_FOUND</code>
+                  - if the project is not found;
+                  <br>
+                  <code>OK</code>
+                  - if success;
+                  <br>
+                  <code>FILE_DOES_NOT_EXIST</code>
+                  - if the file does not exist;
+                  <br>
+                  <code>SERVICE_NOT_FOUND</code>
+                  - if the service is not valid;
+                  <br>
+                  <code>INTERNAL_SERVER_ERROR</code>
+                  - if some error occurs.
+                </dd>
+                <a href="codes.jsp">Click to check the code values</a>
+              </dl>
+              <h4 class="text-right">
+                <a href="#top">Back to Top</a>
+              </h4>
+            </div>
+          </div>
+          <div class="list-group">
+            <div class="list-group-item">
+              <h4 class="list-group-item-heading">
+                <a href="test-file-rename.jsp" target="_blank">op/file/rename</a>
+              </h4>
+              <p class="list-group-item-text">
+              <div class="block">Renames a file.</div>
+              </p>
+              <dl>
+                <dt>
+                  <span class="paramLabel">Parameters:</span>
+                </dt>
+                <dd>
+                  <code>service</code>
+                  - The service name.
+                </dd>
+                <dd>
+                  <code>uuid</code>
+                  - Universally unique identifier of the user.
+                </dd>
+                <dd>
+                  <code>project</code>
+                  - A project owned by the user.
+                </dd>
+                <dd>
+                  <code>parents</code>
+                  - (optional)The parents directory. Null if there is no parents. Parents are separated using the '/' character.
+                </dd>
+                <dd>
+                  <code>oldName</code>
+                  - The old name of the file.
+                </dd>
+                <dd>
+                  <code>newName</code>
+                  - The new name of the file.
+                </dd>
+                <dd>
+                  <code>skipValidation</code>
+                  - True to skip validation.
+                </dd>
+                <dt>
+                  <span class="returnLabel">Returns:</span>
+                </dt>
+                <dd>
+                  A result containing the code of the result.
+                  <br>
+                  <code>USER_ERROR</code>
+                  - if some required parameter is null;
+                  <br>
+                  <code>NOT_AUTHORIZED</code>
+                  - when the user is not authorized to perform an operation;
+                  <br>
+                  <code>PROJECT_NOT_FOUND</code>
+                  - if the project is not found;
+                  <br>
+                  <code>OK</code>
+                  - if success;
+                  <br>
+                  <code>FILE_DOES_NOT_EXIST</code>
+                  - if the file does not exist;
+                  <br>
+                  <code>SERVICE_NOT_FOUND</code>
+                  - if the service is not valid;
+                  <br>
+                  <code>INTERNAL_SERVER_ERROR</code>
+                  - if some error occurs.
+                </dd>
+                <a href="codes.jsp">Click to check the code values</a>
+              </dl>
+              <h4 class="text-right">
+                <a href="#top">Back to Top</a>
+              </h4>
+            </div>
+          </div>
+          <div class="list-group">
+            <div class="list-group-item">
+              <h4 class="list-group-item-heading">
+                <a href="test-file-upload.jsp" target="_blank">op/file/upload</a>
+              </h4>
+              <p class="list-group-item-text">
+              <div class="block">Uploads a file.</div>
+              </p>
+              <dl>
+                <dt>
+                  <span class="paramLabel">Parameters:</span>
+                </dt>
+                <dd>
+                  <code>service</code>
+                  - The service name.
+                </dd>
+                <dd>
+                  <code>uuid</code>
+                  - Universally unique identifier of the user.
+                </dd>
+                <dd>
+                  <code>project</code>
+                  - A project owned by the user.
+                </dd>
+                <dd>
+                  <code>parents</code>
+                  - (optional) The parents directory. Null if there is no parents. Parents are separated using the '/' character.
+                </dd>
+                <dd>
+                  <code>file</code>
+                  - The file.
+                </dd>
+                <dd>
+                  <code>override</code>
+                  - True if the file already exists and want to override.
+                </dd>
+                <dd>
+                  <code>skipValidation</code>
+                  - True to skip validation.
+                </dd>
+                <dt>
+                  <span class="returnLabel">Returns:</span>
+                </dt>
+                <dd>
+                  A result containing the code of the result.
+                  <br>
+                  <code>USER_ERROR</code>
+                  - if some required parameter is null;
+                  <br>
+                  <code>NOT_AUTHORIZED</code>
+                  - when the user is not authorized to perform an operation;
+                  <br>
+                  <code>PROJECT_NOT_FOUND</code>
+                  - if the project is not found;
+                  <br>
+                  <code>OK</code>
+                  - if success;
+                  <br>
+                  <code>FILE_ALREADY_EXISTS</code>
+                  - if the file already exists and 'override' is false;
+                  <br>
+                  <code>SERVICE_NOT_FOUND</code>
+                  - if the service is not valid;
+                  <br>
+                  <code>INTERNAL_SERVER_ERROR</code>
+                  - if some error occurs.
+                </dd>
+                <a href="codes.jsp">Click to check the code values</a>
+              </dl>
+              <h4 class="text-right">
+                <a href="#top">Back to Top</a>
+              </h4>
+            </div>
+          </div>
+        </fieldset>
+      </div>
+      <div class="container">
+        <fieldset class="scheduler-border">
+          <legend class="scheduler-border" id="jobMonitoring">Job Monitoring REST Services</legend>
+          <div class="list-group">
+            <div class="list-group-item">
+              <h4 class="list-group-item-heading">
+                <a href="test-job-monitoring-delete.jsp" target="_blank">op/job-monitoring/delete</a>
+              </h4>
+              <p class="list-group-item-text">
+              <div class="block">Deletes a job result.</div>
+              </p>
+              <dl>
+                <dt>
+                  <span class="paramLabel">Parameters:</span>
+                </dt>
+                <dd>
+                  <code>service</code>
+                  - The service name.
+                </dd>
+                <dd>
+                  <code>uuid</code>
+                  - Universally unique identifier of the user.
+                </dd>
+                <dd>
+                  <code>project</code>
+                  - A project owned by the user.
+                </dd>
+                <dd>
+                  <code>jobId</code>
+                  - The id of the job.
+                </dd>
+                <dd>
+                  <code>skipValidation</code>
+                  - True to skip validation.
+                </dd>
+                <dt>
+                  <span class="returnLabel">Returns:</span>
+                </dt>
+                <dd>
+                  A result containing the code of the result.
+                  <br>
+                  <code>NOT_AUTHORIZED</code>
+                  - when the user is not authorized to perform an operation;
+                  <br>
+                  <code>PROJECT_NOT_FOUND</code>
+                  - if the project is not found;
+                  <br>
+                  <code>OK</code>
+                  - if success;
+                  <br>
+                  <code>USER_ERROR</code>
+                  - if some required parameter is null;
+                  <br>
+                  <code>JOB_DOES_NOT_EXIST</code>
+                  - if the job result does not exist;
+                  <br>
+                  <code>SERVICE_NOT_FOUND</code>
+                  - if the service is not valid;
+                  <br>
+                  <code>INTERNAL_SERVER_ERROR</code>
+                  - if some error occurs.
+                </dd>
+                <a href="codes.jsp">Click to check the code values</a>
+              </dl>
+              <h4 class="text-right">
+                <a href="#top">Back to Top</a>
+              </h4>
+            </div>
+          </div>
+          <div class="list-group">
+            <div class="list-group-item">
+              <h4 class="list-group-item-heading">
+                <a href="test-job-monitoring-download.jsp" target="_blank">op/job-monitoring/download</a>
+              </h4>
+              <p class="list-group-item-text">
+              <div class="block">Downloads a file from the immutable file history.</div>
+              </p>
+              <dl>
+                <dt>
+                  <span class="paramLabel">Parameters:</span>
+                </dt>
+                <dd>
+                  <code>service</code>
+                  - The service name.
+                </dd>
+                <dd>
+                  <code>uuid</code>
+                  - Universally unique identifier of the user.
+                </dd>
+                <dd>
+                  <code>project</code>
+                  - A project owned by the user.
+                </dd>
+                <dd>
+                  <code>jobId</code>
+                  - The id of the job.
+                </dd>
+                <dd>
+                  <code>parents</code>
+                  - (optional) The parents directory. Null if there is no parents.
+                </dd>
+                <dd>
+                  <code>file</code>
+                  - The file name.
+                </dd>
+                <dd>
+                  <code>skipValidation</code>
+                  - True to skip validation.
+                </dd>
+                <dt>
+                  <span class="returnLabel">Returns:</span>
+                </dt>
+                <dd>
+                  The file content or null if the file was not found and a result.
+                  <br>
+                  <code>OK</code>
+                  - if the file download was successful;
+                  <br>
+                  <code>NO_CONTENT</code>
+                  - if the file was not found or some error occur;
+                  <br>
+                </dd>
+                <a href="codes.jsp">Click to check the code values</a>
+              </dl>
+              <h4 class="text-right">
+                <a href="#top">Back to Top</a>
+              </h4>
+            </div>
+          </div>
+          <div class="list-group">
+            <div class="list-group-item">
+              <h4 class="list-group-item-heading">
+                <a href="test-job-monitoring-get.jsp" target="_blank">op/job-monitoring/get</a>
+              </h4>
+              <p class="list-group-item-text">
+              <div class="block">Gets the job result.</div>
+              </p>
+              <dl>
+                <dt>
+                  <span class="paramLabel">Parameters:</span>
+                </dt>
+                <dd>
+                  <code>service</code>
+                  - The service name.
+                </dd>
+                <dd>
+                  <code>uuid</code>
+                  - Universally unique identifier of the user.
+                </dd>
+                <dd>
+                  <code>project</code>
+                  - A project owned by the user.
+                </dd>
+                <dd>
+                  <code>jobId</code>
+                  - The id of the job.
+                </dd>
+                <dd>
+                  <code>skipValidation</code>
+                  - True to skip validation.
+                </dd>
+                <dt>
+                  <span class="returnLabel">Returns:</span>
+                </dt>
+                <dd>
+                  A result containing the status of the job and the code of the result.
+                  <br>
+                  <code>USER_ERROR</code>
+                  - if some required parameter is null;
+                  <br>
+                  <code>NOT_AUTHORIZED</code>
+                  - when the user is not authorized to perform an operation;
+                  <br>
+                  <code>PROJECT_NOT_FOUND</code>
+                  - if the project is not found;
+                  <br>
+                  <code>OK</code>
+                  - if success;
+                  <br>
+                  <code>FILE_DOES_NOT_EXIST</code>
+                  - if the file does not exist;
+                  <br>
+                  <code>SERVICE_NOT_FOUND</code>
+                  - if the service is not valid;
+                  <br>
+                  <code>INTERNAL_SERVER_ERROR</code>
+                  - if some error occurs.
+                </dd>
+                <a href="codes.jsp">Click to check the code values</a>
+              </dl>
+              <h4 class="text-right">
+                <a href="#top">Back to Top</a>
+              </h4>
+            </div>
+          </div>
+          <div class="list-group">
+            <div class="list-group-item">
+              <h4 class="list-group-item-heading">
+                <a href="test-job-monitoring-history.jsp" target="_blank">op/job-monitoring/history</a>
+              </h4>
+              <p class="list-group-item-text">
+              <div class="block">Gets the immutable file history used and returned by the job.</div>
+              </p>
+              <dl>
+                <dt>
+                  <span class="paramLabel">Parameters:</span>
+                </dt>
+                <dd>
+                  <code>service</code>
+                  - The service name.
+                </dd>
+                <dd>
+                  <code>uuid</code>
+                  - Universally unique identifier of the user.
+                </dd>
+                <dd>
+                  <code>project</code>
+                  - A project owned by the user.
+                </dd>
+                <dd>
+                  <code>jobId</code>
+                  - The id of the job.
+                </dd>
+                <dd>
+                  <code>parents</code>
+                  - (optional) The parents directory. Null if there is no parents
+                </dd>
+                <dd>
+                  <code>file</code>
+                  - (optional) The file name. Null if there is not file name
+                </dd>
+                <dd>
+                  <code>skipValidation</code>
+                  - True to skip validation.
+                </dd>
+                <dt>
+                  <span class="returnLabel">Returns:</span>
+                </dt>
+                <dd>
+                  A result containing the status of the job and the code of the result.
+                  <br>
+                  <code>USER_ERROR</code>
+                  - if some required parameter is null;
+                  <br>
+                  <code>NOT_AUTHORIZED</code>
+                  - when the user is not authorized to perform an operation;
+                  <br>
+                  <code>PROJECT_NOT_FOUND</code>
+                  - if the project is not found;
+                  <br>
+                  <code>USER_ERROR</code>
+                  - if the job is not valid;
+                  <br>
+                  <code>OK</code>
+                  - if success;
+                  <br>
+                  <code>FILE_DOES_NOT_EXIST</code>
+                  - if the file does not exist;
+                  <br>
+                  <code>SERVICE_NOT_FOUND</code>
+                  - if the service is not valid;
+                  <br>
+                  <code>INTERNAL_SERVER_ERROR</code>
+                  - if some error occurs.
+                </dd>
+                <a href="codes.jsp">Click to check the code values</a>
+              </dl>
+              <h4 class="text-right">
+                <a href="#top">Back to Top</a>
+              </h4>
+            </div>
+          </div>
+          <div class="list-group">
+            <div class="list-group-item">
+              <h4 class="list-group-item-heading">
+                <a href="test-job-monitoring-list.jsp" target="_blank">op/job-monitoring/list</a>
+              </h4>
+              <p class="list-group-item-text">
+              <div class="block">Lists all results in a given period.</div>
+              </p>
+              <dl>
+                <dt>
+                  <span class="paramLabel">Parameters:</span>
+                </dt>
+                <dd>
+                  <code>service</code>
+                  - The service name.
+                </dd>
+                <dd>
+                  <code>uuid</code>
+                  - Universally unique identifier of the user.
+                </dd>
+                <dd>
+                  <code>project</code>
+                  - A project owned by the user.
+                </dd>
+                <dd>
+                  <code>from</code>
+                  - (optional) The minimum start date of the job, or null for dates from any period.
+                </dd>
+                <dd>
+                  <code>to</code>
+                  - (optional) The maximum start date of the job, or null for dates to any period.
+                </dd>
+                <dd>
+                  <code>skipValidation</code>
+                  - True to skip validation.
+                </dd>
+                <dt>
+                  <span class="returnLabel">Returns:</span>
+                </dt>
+                <dd>
+                  A result containing the list of statuses and the code of the result.
+                  <br>
+                  <code>NOT_AUTHORIZED</code>
+                  - when the user is not authorized to perform an operation;
+                  <br>
+                  <code>USER_ERROR</code>
+                  - if the format of one the dates(from or to) is not null and is incorrect, or if some required parameter is null;
+                  <br>
+                  <code>OK</code>
+                  - if success;
+                  <br>
+                  <code>SERVICE_NOT_FOUND</code>
+                  - if the service is not valid;
+                  <br>
+                  <code>INTERNAL_SERVER_ERROR</code>
+                  - if some error occurs.
+                </dd>
+                <a href="codes.jsp">Click to check the code values</a>
+              </dl>
+              <h4 class="text-right">
+                <a href="#top">Back to Top</a>
+              </h4>
+            </div>
+          </div>
+          <div class="list-group">
+            <div class="list-group-item">
+              <h4 class="list-group-item-heading">
+                <a href="test-job-monitoring-log.jsp" target="_blank">op/job-monitoring/log</a>
+              </h4>
+              <p class="list-group-item-text">
+              <div class="block">Gets the log of the job.</div>
+              </p>
+              <dl>
+                <dt>
+                  <span class="paramLabel">Parameters:</span>
+                </dt>
+                <dd>
+                  <code>service</code>
+                  - The service name.
+                </dd>
+                <dd>
+                  <code>uuid</code>
+                  - Universally unique identifier of the user.
+                </dd>
+                <dd>
+                  <code>project</code>
+                  - A project owned by the user.
+                </dd>
+                <dd>
+                  <code>jobId</code>
+                  - The id of the job.
+                </dd>
+                <dd>
+                  <code>skipValidation</code>
+                  - True to skip validation.
+                </dd>
+                <dt>
+                  <span class="returnLabel">Returns:</span>
+                </dt>
+                <dd>
+                  The log of the job.
+                  <br>
+                  <code>OK</code>
+                  - if success;
+                  <br>
+                  <code>NO_CONTENT</code>
+                  - if the log can not be returned;
+                  <br>
+                </dd>
+                <a href="codes.jsp">Click to check the code values</a>
+              </dl>
+              <h4 class="text-right">
+                <a href="#top">Back to Top</a>
+              </h4>
+            </div>
+          </div>
+          <div class="list-group">
+            <div class="list-group-item">
+              <h4 class="list-group-item-heading">
+                <a href="test-job-monitoring-status.jsp" target="_blank">op/job-monitoring/status</a>
+              </h4>
+              <p class="list-group-item-text">
+              <div class="block">Gets the status of the job.</div>
+              </p>
+              <dl>
+                <dt>
+                  <span class="paramLabel">Parameters:</span>
+                </dt>
+                <dd>
+                  <code>service</code>
+                  - The service name.
+                </dd>
+                <dd>
+                  <code>uuid</code>
+                  - Universally unique identifier of the user.
+                </dd>
+                <dd>
+                  <code>project</code>
+                  - A project owned by the user.
+                </dd>
+                <dd>
+                  <code>jobId</code>
+                  - The id of the job.
+                </dd>
+                <dd>
+                  <code>skipValidation</code>
+                  - True to skip validation.
+                </dd>
+                <dt>
+                  <span class="returnLabel">Returns:</span>
+                </dt>
+                <dd>
+                  A result containing the status of the job and the code of the result.
+                  <br>
+                  <code>USER_ERROR</code>
+                  - if some required parameter is null;
+                  <br>
+                  <code>NOT_AUTHORIZED</code>
+                  - when the user is not authorized to perform an operation;
+                  <br>
+                  <code>PROJECT_NOT_FOUND</code>
+                  - if the project is not found;
+                  <br>
+                  <code>OK</code>
+                  - if success;
+                  <br>
+                  <code>FILE_DOES_NOT_EXIST</code>
+                  - if the file does not exist;
+                  <br>
+                  <code>SERVICE_NOT_FOUND</code>
+                  - if the service is not valid;
+                  <br>
+                  <code>INTERNAL_SERVER_ERROR</code>
+                  - if some error occurs.
+                </dd>
+                <a href="codes.jsp">Click to check the code values</a>
+              </dl>
+              <h4 class="text-right">
+                <a href="#top">Back to Top</a>
+              </h4>
+            </div>
+          </div>
+        </fieldset>
+      </div>
+      <div class="container">
+        <fieldset class="scheduler-border">
+          <legend class="scheduler-border" id="jobSubmission">Job Submission REST Services</legend>
+          <div class="list-group">
+            <div class="list-group-item">
+              <h4 class="list-group-item-heading">
+                <a href="test-job-submission-cancel.jsp" target="_blank">op/job-submission/cancel</a>
+              </h4>
+              <p class="list-group-item-text">
+              <div class="block">Cancels a job.</div>
+              </p>
+              <dl>
+                <dt>
+                  <span class="paramLabel">Parameters:</span>
+                </dt>
+                <dd>
+                  <code>service</code>
+                  - The service name.
+                </dd>
+                <dd>
+                  <code>uuid</code>
+                  - Universally unique identifier of the user.
+                </dd>
+                <dd>
+                  <code>project</code>
+                  - A project owned by the user.
+                </dd>
+                <dd>
+                  <code>jobId</code>
+                  - The id of the job.
+                </dd>
+                <dd>
+                  <code>skipValidation</code>
+                  - True to skip validation.
+                </dd>
+                <dt>
+                  <span class="returnLabel">Returns:</span>
+                </dt>
+                <dd>
+                  A result containing the code of the result.
+                  <br>
+                  <code>NOT_AUTHORIZED</code>
+                  - when the user is not authorized to perform an operation;
+                  <br>
+                  <code>PROJECT_NOT_FOUND</code>
+                  - if the project is not found;
+                  <br>
+                  <code>JOB_CANNOT_BE_CANCELLED</code>
+                  - if the job can not be cancelled.;
+                  <br>
+                  <code>OK</code>
+                  - if success;
+                  <br>
+                  <code>USER_ERROR</code>
+                  - if some required parameter is null;
+                  <br>
+                  <code>SERVICE_NOT_FOUND</code>
+                  - if the service is not valid;
+                  <br>
+                  <code>INTERNAL_SERVER_ERROR</code>
+                  - if some error occurs.
+                </dd>
+                <a href="codes.jsp">Click to check the code values</a>
+              </dl>
+              <h4 class="text-right">
+                <a href="#top">Back to Top</a>
+              </h4>
+            </div>
+          </div>
+          <div class="list-group">
+            <div class="list-group-item">
+              <h4 class="list-group-item-heading">
+                <a href="test-job-submission-run.jsp" target="_blank">op/job-submission/run</a>
+              </h4>
+              <p class="list-group-item-text">
+              <div class="block">Runs a job.</div>
+              </p>
+              <dl>
+                <dt>
+                  <span class="paramLabel">Parameters:</span>
+                </dt>
+                <dd>
+                  <code>service</code>
+                  - The service name.
+                </dd>
+                <dd>
+                  <code>uuid</code>
+                  - Universally unique identifier of the user.
+                </dd>
+                <dd>
+                  <code>project</code>
+                  - A project owned by the user.
+                </dd>
+                <dd>
+                  <code>application</code>
+                  - The name of the application.
+                </dd>
+                <dd>
+                  <code>version</code>
+                  - The version of the application.
+                </dd>
+                <dd>
+                  <code>resource</code>
+                  - The resource where the job will be executed or null for automatic selection.
+                </dd>
+                <dd>
+                  <code>args</code>
+                  - The arguments of the job. The used format is 'ARGUMENT1::VALUE1;ARGUMENT2::VALUE2;ARGUMENT3::VALUE3'.
+                </dd>
+                <dd>
+                  <code>extras</code>
+                  - Extra arguments for job execution. The used format is 'ARGUMENT1::VALUE1;ARGUMENT2::VALUE2;ARGUMENT3::VALUE3'.
+                </dd>
+                <dd>
+                  <code>skipValidation</code>
+                  - True to skip validation.
+                </dd>
+                <dt>
+                  <span class="returnLabel">Returns:</span>
+                </dt>
+                <dd>
+                  A result containing the job id(if success), or a result containing the missing args(if some required arg is null), and the code of the result.
+                  <br>
+                  <code>NOT_AUTHORIZED</code>
+                  - when the user is not authorized to perform an operation;
+                  <br>
+                  <code>PROJECT_NOT_FOUND</code>
+                  - if the project is not found;
+                  <br>
+                  <code>OK</code>
+                  - if success;
+                  <br>
+                  <code>USER_ERROR</code>
+                  - if some required inputed value is not valid or is null;
+                  <br>
+<!--                   <code>MISSING_REQUIRED_APP_ARG</code> -->
+<!--                   - if some required required application parameter value is null; -->
+<!--                   <br> -->
+                  <code>SERVICE_NOT_FOUND</code>
+                  - if the service is not valid;
+                  <br>
+                  <code>INTERNAL_SERVER_ERROR</code>
+                  - if some error occurs.
+                </dd>
+                <a href="codes.jsp">Click to check the code values</a>
+              </dl>
+              <h4 class="text-right">
+                <a href="#top">Back to Top</a>
+              </h4>
+            </div>
+          </div>
+        </fieldset>
+      </div>
+      <div class="container">
+        <fieldset class="scheduler-border">
+          <legend class="scheduler-border" id="resourceMonitoring">Resource Monitoring REST Services</legend>
+          <div class="list-group">
+            <div class="list-group-item">
+              <h4 class="list-group-item-heading">
+                <a href="test-resource-monitoring-get.jsp" target="_blank">op/resource-monitoring/get</a>
+              </h4>
+              <p class="list-group-item-text">
+              <div class="block">Gets a resource information.</div>
+              </p>
+              <dl>
+                <dt>
+                  <span class="paramLabel">Parameters:</span>
+                </dt>
+                <dd>
+                  <code>service</code>
+                  - The service name.
+                </dd>
+                <dd>
+                  <code>uuid</code>
+                  - Universally unique identifier of the user.
+                </dd>
+                <dd>
+                  <code>resource</code>
+                  - The name of the resource.
+                </dd>
+                <dt>
+                  <span class="returnLabel">Returns:</span>
+                </dt>
+                <dd>
+                  A result containing the resource information and the code of the result.
+                  <br>
+                  <code>NOT_AUTHORIZED</code>
+                  - when the user is not authorized to perform an operation;
+                  <br>
+                  <code>OK</code>
+                  - if success;
+                  <br>
+                  <code>USER_ERROR</code>
+                  - if the resource or the uuid is null;
+                  <br>
+                  <code>FILE_DOES_NOT_EXIST</code>
+                  - if the resource does not exist;
+                  <br>
+                  <code>SERVICE_NOT_FOUND</code>
+                  - if the service is not valid;
+                  <br>
+                  <code>INTERNAL_SERVER_ERROR</code>
+                  - if some error occurs.
+                </dd>
+                <a href="codes.jsp">Click to check the code values</a>
+              </dl>
+              <h4 class="text-right">
+                <a href="#top">Back to Top</a>
+              </h4>
+            </div>
+          </div>
+          <div class="list-group">
+            <div class="list-group-item">
+              <h4 class="list-group-item-heading">
+                <a href="test-resource-monitoring-list.jsp" target="_blank">op/resource-monitoring/list</a>
+              </h4>
+              <p class="list-group-item-text">
+              <div class="block">List all the resources available for the user.</div>
+              </p>
+              <dl>
+                <dt>
+                  <span class="paramLabel">Parameters:</span>
+                </dt>
+                <dd>
+                  <code>service</code>
+                  - The service name.
+                </dd>
+                <dd>
+                  <code>uuid</code>
+                  - Universally unique identifier of the user.
+                </dd>
+                <dt>
+                  <span class="returnLabel">Returns:</span>
+                </dt>
+                <dd>
+                  A result containing the resource information and the code of the result.
+                  <br>
+                  <code>USER_ERROR</code>
+                  - if the uuid is null;
+                  <br>
+                  <code>NOT_AUTHORIZED</code>
+                  - when the user is not authorized to perform an operation;
+                  <br>
+                  <code>OK</code>
+                  - if success;
+                  <br>
+                  <code>SERVICE_NOT_FOUND</code>
+                  - if the service is not valid;
+                  <br>
+                  <code>INTERNAL_SERVER_ERROR</code>
+                  - if some error occurs.
+                </dd>
+                <a href="codes.jsp">Click to check the code values</a>
+              </dl>
+              <h4 class="text-right">
+                <a href="#top">Back to Top</a>
+              </h4>
+            </div>
+          </div>
+        </fieldset>
+      </div>
+
+
+      <div class="container">
+        <fieldset class="scheduler-border">
+          <legend class="scheduler-border" id="service">Service REST Services</legend>
+          <div class="list-group">
+            <div class="list-group-item">
+              <h4 class="list-group-item-heading">
+                <a href="test-service-list.jsp" target="_blank">op/service/list</a>
+              </h4>
+              <p class="list-group-item-text">
+              <div class="block">List the services that are available on REST.</div>
+              </p>
+              <dl>
+                <dt>
+                  <span class="returnLabel">Returns:</span>
+                </dt>
+                <dd>
+                  A list containing the name of all services available for the user of the result.
+                  <br>
+                  <code>OK</code>
+                  - if success;
+                  <br>
+                  <code>INTERNAL_SERVER_ERROR</code>
+                  - if some error occurs.
+                </dd>
+                <a href="codes.jsp">Click to check the code values</a>
+              </dl>
+              <h4 class="text-right">
+                <a href="#top">Back to Top</a>
+              </h4>
+            </div>
+        </fieldset>
+      </div>
+    </div>
+    <div ng-show="viewExemples">
+      
+<div class="container" ng-init="tabActive=1">
+  <ul class="nav nav-pills nav-justified">
+    <li ng-class="{active: tabActive==1}">
+      <a href="#java" ng-click="tabActive=1">Java</a>
+    </li>
+    <li ng-class="{active: tabActive==2}">
+      <a href="#php" ng-click="tabActive=2">PHP</a>
+    </li>
+    <li ng-class="{active: tabActive==3}">
+      <a href="#python" ng-click="tabActive=3">Python</a>
+    </li>
+  </ul>
+  <br>
+  <fieldset class="scheduler-border">
+    <div ng-show="tabActive==1">
+      <legend class="scheduler-border" id="java exemples">Java Examples</legend>
+       <div class="list-group" ng-init="exampleActive=1">
+        <ul class="nav nav-tabs">
+          <li ng-class="{active: exampleActive==1}">
+            <a href="#java" ng-click="exampleActive=1">Login</a>
+          </li>
+          <li ng-class="{active: exampleActive==2}">
+            <a href="#php" ng-click="exampleActive=2">Upload</a>
+          </li>
+          <li ng-class="{active: exampleActive==3}">
+            <a href="#python" ng-click="exampleActive=3">Download</a>
+          </li>
+        </ul>
+        <div class="list-group-item">
+          <div ng-show="exampleActive==1">
+            <h4 class="list-group-item-heading">
+              <a href="" target="_blank">op/authentication/login example</a>
+            </h4>
+            </br>
+            <!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .1em;padding:.2em .6em;"><table><tr><td><pre style="margin: 0; line-height: 125%"> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41</pre></td><td><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">package</span> br.lncc.sinapad.rest.examples;
+
+<span style="color: #0000ff">import</span> java.io.BufferedReader;
+<span style="color: #0000ff">import</span> java.io.DataOutputStream;
+<span style="color: #0000ff">import</span> java.io.IOException;
+<span style="color: #0000ff">import</span> java.io.InputStreamReader;
+<span style="color: #0000ff">import</span> java.net.HttpURLConnection;
+<span style="color: #0000ff">import</span> java.net.URL;
+<span style="color: #0000ff">import</span> javax.ws.rs.core.MediaType;
+
+<span style="color: #0000ff">public</span> <span style="color: #0000ff">class</span> <span style="color: #2b91af">ExampleLogin</span> {
+    <span style="color: #0000ff">public</span> <span style="color: #0000ff">static</span> <span style="color: #2b91af">void</span> main(String[] args) <span style="color: #0000ff">throws</span> IOException {
+        URL url = <span style="color: #0000ff">new</span> URL(<span style="color: #a31515">&quot;http://<span id="hostExLoginJAVA"></span>op/authentication/login-ldap&quot;</span>);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+        connection.setRequestMethod(<span style="color: #a31515">&quot;POST&quot;</span>);
+        connection.setDoOutput(<span style="color: #0000ff">true</span>);
+        connection.setRequestProperty(<span style="color: #a31515">&quot;Accept&quot;</span>, MediaType.APPLICATION_XML);
+        <span style="color: #008000">// connection.setRequestProperty(&quot;Accept&quot;, MediaType.APPLICATION_JSON);</span>
+
+        String parameters = <span style="color: #a31515">&quot;username=name&amp;password=password&amp;service=service&quot;</span>;
+        DataOutputStream wr = <span style="color: #0000ff">new</span> DataOutputStream(connection.getOutputStream());
+        wr.writeBytes(parameters);
+        wr.flush();
+        wr.close();
+
+        <span style="color: #2b91af">int</span> code = connection.getResponseCode();
+        <span style="color: #0000ff">if</span> (code == 200) {
+            InputStreamReader is = <span style="color: #0000ff">new</span> InputStreamReader(connection.getInputStream());
+            BufferedReader br = <span style="color: #0000ff">new</span> BufferedReader(is);
+
+            String response = <span style="color: #a31515">&quot;&quot;</span>;
+            String line = <span style="color: #0000ff">null</span>;
+            <span style="color: #0000ff">while</span> ((line = br.readLine()) != <span style="color: #0000ff">null</span>) {
+                  response += line;
+            }
+            br.close();
+            System.out.println(response);
+       }
+    }
+}
+</pre></td></tr></table>
+          <h4 class="text-right">
+            <a href="#top">Back to Top</a>
+          </h4></div>
+
+          </div>
+          <div ng-show="exampleActive==2">
+            <h4 class="list-group-item-heading">
+              <a href="" target="_blank">op/file/upload example</a>
+            </h4>
+            </br>
+            <!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .1em;padding:.2em .6em;"><table><tr><td><pre style="margin: 0; line-height: 125%"> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+100
+101</pre></td><td><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">import</span> java.io.BufferedReader;
+<span style="color: #0000ff">import</span> java.io.DataOutputStream;
+<span style="color: #0000ff">import</span> java.io.File;
+<span style="color: #0000ff">import</span> java.io.IOException;
+<span style="color: #0000ff">import</span> java.io.InputStreamReader;
+<span style="color: #0000ff">import</span> java.io.OutputStream;
+<span style="color: #0000ff">import</span> java.net.HttpURLConnection;
+<span style="color: #0000ff">import</span> java.net.URL;
+<span style="color: #0000ff">import</span> java.util.HashMap;
+<span style="color: #0000ff">import</span> java.util.Iterator;
+<span style="color: #0000ff">import</span> java.util.Map;
+<span style="color: #0000ff">import</span> java.util.Set;
+<span style="color: #0000ff">import</span> org.codehaus.jettison.json.JSONObject;
+<span style="color: #0000ff">import</span> com.google.common.io.Files;
+
+<span style="color: #0000ff">public</span> <span style="color: #0000ff">class</span> <span style="color: #2b91af">ExampleUpload</span> {
+    <span style="color: #0000ff">public</span> <span style="color: #0000ff">static</span> <span style="color: #2b91af">void</span> main(String[] args) <span style="color: #0000ff">throws</span> Exception {
+        <span style="color: #008000">// uuid = op/authentication/login-ldap</span>
+        String uuid;
+        File file = <span style="color: #0000ff">new</span> File(<span style="color: #a31515">&quot;filePath&quot;</span>);
+
+        String boundary = <span style="color: #a31515">&quot;*****&quot;</span>;
+        String project = <span style="color: #a31515">&quot;PROJECT&quot;</span>;
+        String service = <span style="color: #a31515">&quot;SERVICE&quot;</span>;
+        String override = <span style="color: #a31515">&quot;true&quot;</span>;
+
+        URL url = <span style="color: #0000ff">new</span> URL(<span style="color: #a31515">&quot;http://<span id="hostExUploadJAVA"></span>op/file/upload&quot;</span>);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod(<span style="color: #a31515">&quot;POST&quot;</span>);
+        connection.setDoOutput(<span style="color: #0000ff">true</span>);
+        connection.setRequestProperty(<span style="color: #a31515">&quot;Content-Type&quot;</span>, <span style="color: #a31515">&quot;multipart/form-data;boundary=&quot;</span> + boundary);
+        connection.setRequestProperty(<span style="color: #a31515">&quot;Accept&quot;</span>, <span style="color: #a31515">&quot;application/json&quot;</span>);
+        <span style="color: #008000">// connection.setRequestProperty("Accept","application/xml")</span>
+        
+        HashMap&lt;String, Object&gt; parameters = <span style="color: #0000ff">new</span> HashMap&lt;&gt;();
+        parameters.put(<span style="color: #a31515">&quot;uuid&quot;</span>, uuid);
+        parameters.put(<span style="color: #a31515">&quot;project&quot;</span>, project);
+        parameters.put(<span style="color: #a31515">&quot;service&quot;</span>, service);
+        parameters.put(<span style="color: #a31515">&quot;override&quot;</span>, override);
+        parameters.put(<span style="color: #a31515">&quot;file&quot;</span>, file);
+
+        sendHttpPOST(connection.getOutputStream(), parameters);
+
+        <span style="color: #2b91af">int</span> code = connection.getResponseCode();
+        System.out.println(code);
+        <span style="color: #008000">// 200 is http success code</span>
+        <span style="color: #0000ff">if</span> (code == 200) {
+            BufferedReader in = <span style="color: #0000ff">new</span> BufferedReader(<span style="color: #0000ff">new</span> InputStreamReader(connection.getInputStream()));
+            String response = <span style="color: #a31515">&quot;&quot;</span>;
+            String line = <span style="color: #0000ff">null</span>;
+            <span style="color: #0000ff">while</span> ((line = in.readLine()) != <span style="color: #0000ff">null</span>) {
+                response += line;
+            }
+            in.close();
+            JSONObject json = <span style="color: #0000ff">new</span> JSONObject(response);
+            <span style="color: #0000ff">if</span> (json.getInt(<span style="color: #a31515">&quot;code&quot;</span>) == 200) {
+                System.out.println(<span style="color: #a31515">&quot;SUCCESS!!&quot;</span>);
+            }
+        }
+    }
+
+    <span style="color: #0000ff">private</span> <span style="color: #0000ff">static</span> <span style="color: #2b91af">void</span> sendHttpPOST(OutputStream out, Map&lt;String, Object&gt; parameters) <span style="color: #0000ff">throws</span> IOException {
+        String crlf = <span style="color: #a31515">&quot;\r\n&quot;</span>;
+        String twoHyphens = <span style="color: #a31515">&quot;--&quot;</span>;
+        String boundary = <span style="color: #a31515">&quot;*****&quot;</span>;
+
+        Set&lt;String&gt; keys = parameters.keySet();
+        Iterator&lt;String&gt; i = keys.iterator();
+
+        DataOutputStream wr = <span style="color: #0000ff">new</span> DataOutputStream(out);
+        <span style="color: #0000ff">while</span> (i.hasNext()) {
+            String key = i.next();
+            <span style="color: #0000ff">if</span> (parameters.get(key) <span style="color: #0000ff">instanceof</span> String) {
+                wr.writeBytes(twoHyphens + boundary + crlf);
+                wr.writeBytes(<span style="color: #a31515">&quot;Content-Disposition: form-data; name=\&quot;&quot;</span> + key + <span style="color: #a31515">&quot;\&quot;&quot;</span> + crlf);
+                wr.writeBytes(<span style="color: #a31515">&quot;Content-Type: text/plain;charset=UTF-8&quot;</span> + crlf + <span style="color: #a31515">&quot;Content-Length: &quot;</span> + parameters.get(key).toString().length() + crlf + crlf);
+                wr.writeBytes(parameters.get(key) + crlf);
+            } <span style="color: #0000ff">else</span> <span style="color: #0000ff">if</span> (parameters.get(key) <span style="color: #0000ff">instanceof</span> File) {
+                File file = (File) parameters.get(key);
+                <span style="color: #2b91af">byte</span>[] arr = Files.toByteArray(file);
+                wr.writeBytes(twoHyphens + boundary + crlf);
+                wr.writeBytes(<span style="color: #a31515">&quot;Content-Disposition: form-data; name=\&quot;&quot;</span> + key + <span style="color: #a31515">&quot;\&quot;;filename=\&quot;&quot;</span> + file.getName() + <span style="color: #a31515">&quot;\&quot;&quot;</span> + crlf);
+                wr.writeBytes(crlf);
+                wr.write(arr);
+                wr.writeBytes(crlf);
+            }
+        }
+        wr.writeBytes(twoHyphens + boundary + twoHyphens + crlf);
+        wr.flush();
+        wr.close();
+    }
+}
+</pre></td></tr></table>
+          <h4 class="text-right">
+            <a href="#top">Back to Top</a>
+          </h4></div>
+
+          </div>
+          <div ng-show="exampleActive==3">
+            <h4 class="list-group-item-heading">
+              <a href="" target="_blank">op/file/download example</a>
+            </h4>
+            </br>
+            <!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .1em;padding:.2em .6em;"><table><tr><td><pre style="margin: 0; line-height: 125%"> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43</pre></td><td><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">import</span> java.io.BufferedReader;
+<span style="color: #0000ff">import</span> java.io.DataOutputStream;
+<span style="color: #0000ff">import</span> java.io.File;
+<span style="color: #0000ff">import</span> java.io.IOException;
+<span style="color: #0000ff">import</span> java.io.InputStreamReader;
+<span style="color: #0000ff">import</span> java.net.HttpURLConnection;
+<span style="color: #0000ff">import</span> java.net.URL;
+<span style="color: #0000ff">import</span> org.apache.commons.io.FileUtils;
+<span style="color: #0000ff">import</span> org.codehaus.jettison.json.JSONException;
+<span style="color: #0000ff">import</span> org.codehaus.jettison.json.JSONObject;
+
+<span style="color: #0000ff">public</span> <span style="color: #0000ff">class</span> <span style="color: #2b91af">ExampleDownload</span> {
+    <span style="color: #0000ff">public</span> <span style="color: #0000ff">static</span> <span style="color: #2b91af">void</span> main(String[] args) <span style="color: #0000ff">throws</span> Exception {
+        <span style="color: #008000">// uuid = op/authentication/login-ldap</span>
+        String uuid;
+        String service = <span style="color: #a31515">&quot;SERVICE&quot;</span>;
+        String project = <span style="color: #a31515">&quot;PROJECT&quot;</span>;
+        String parents = <span style="color: #a31515">&quot;parents&quot;</span>;
+        String fileName = <span style="color: #a31515">&quot;fileName&quot;</span>;
+
+        URL url = <span style="color: #0000ff">new</span> URL(<span style="color: #a31515">&quot;http://<span id="hostExDownloadJAVA"></span>op/file/download&quot;</span>);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+        connection.setRequestMethod(<span style="color: #a31515">&quot;POST&quot;</span>);
+        connection.setDoOutput(<span style="color: #0000ff">true</span>);
+        connection.setRequestProperty(<span style="color: #a31515">&quot;Accept&quot;</span>, <span style="color: #a31515">&quot;application/octet-stream&quot;</span>);
+
+        String parameters = <span style="color: #a31515">&quot;uuid=&quot;</span> + uuid + <span style="color: #a31515">&quot;&amp;service=&quot;</span> + service + <span style="color: #a31515">&quot;&amp;project=&quot;</span> + project + <span style="color: #a31515">&quot;&amp;parents=&quot;</span> + parents +  <span style="color: #a31515">&quot;&amp;file=&quot;</span> + fileName;
+        DataOutputStream wr = <span style="color: #0000ff">new</span> DataOutputStream(connection.getOutputStream());
+        wr.writeBytes(parameters);
+        wr.flush();
+        wr.close();
+
+        <span style="color: #2b91af">int</span> code = connection.getResponseCode();
+        <span style="color: #008000">// 200 is http success code</span>
+        <span style="color: #0000ff">if</span> (code == 200) {
+            File file = <span style="color: #0000ff">new</span> File(fileName);
+            FileUtils.copyInputStreamToFile(connection.getInputStream(), file);
+            System.out.println(<span style="color: #a31515">&quot;SUCCESS&quot;</span>);
+        }
+        System.err.println(<span style="color: #a31515">&quot;ERROR: &quot;</span> + code);
+    }
+}
+</pre></td></tr></table>
+          <h4 class="text-right">
+            <a href="#top">Back to Top</a>
+          </h4></div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div ng-show="tabActive==2">
+      <legend class="scheduler-border" id="php exemples">PHP Examples</legend>
+      <div class="list-group" ng-init="exampleActive=1">
+        <ul class="nav nav-tabs">
+          <li ng-class="{active: exampleActive==1}">
+            <a href="#java" ng-click="exampleActive=1">Login</a>
+          </li>
+          <li ng-class="{active: exampleActive==2}">
+            <a href="#php" ng-click="exampleActive=2">Upload</a>
+          </li>
+          <li ng-class="{active: exampleActive==3}">
+            <a href="#python" ng-click="exampleActive=3">Download</a>
+          </li>
+        </ul>
+        <div class="list-group-item">
+          <div ng-show="exampleActive==1">
+            <h4 class="list-group-item-heading">
+              <a href="" target="_blank">op/authentication/login example</a>
+            </h4>
+            </br>
+            <!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .1em;padding:.2em .6em;"><table><tr><td><pre style="margin: 0; line-height: 125%"> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30</pre></td><td><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">&lt;?php</span>
+    $url = <span style="color: #a31515">&#39;http://<span id="hostExLoginPHP"></span>op/authentication/login-ldap&#39;</span>;
+
+    $data = <span style="color: #0000ff">array</span>(
+     <span style="color: #a31515">&#39;username&#39;</span>=&gt; <span style="color: #a31515">&#39;username&#39;</span>,
+     <span style="color: #a31515">&#39;password&#39;</span>=&gt; <span style="color: #a31515">&#39;password&#39;</span>,
+     <span style="color: #a31515">&#39;service&#39;</span>=&gt; <span style="color: #a31515">&#39;service&#39;</span>
+    );
+
+    $headers = <span style="color: #0000ff">array</span>(
+     <span style="color: #a31515">&#39;Accept: application/xml&#39;</span>
+     <span style="color: #008000">#&#39;Accept: application/json&#39;</span>
+    );
+         
+    $handle = curl_init();
+    curl_setopt($handle, CURLOPT_URL, $url);
+    curl_setopt($handle, CURLOPT_HTTPHEADER, $headers);
+    curl_setopt($handle, CURLOPT_RETURNTRANSFER, <span style="color: #0000ff">true</span>);
+    curl_setopt($handle, CURLOPT_SSL_VERIFYHOST, <span style="color: #0000ff">false</span>);
+    curl_setopt($handle, CURLOPT_SSL_VERIFYPEER, <span style="color: #0000ff">false</span>);
+
+    curl_setopt($handle, CURLOPT_POST, <span style="color: #0000ff">true</span>);
+    curl_setopt($handle, CURLOPT_POSTFIELDS, http_build_query($data));
+
+     
+    $response = curl_exec($handle);
+    $code = curl_getinfo($handle, CURLINFO_HTTP_CODE);
+	
+    <span style="color: #0000ff">echo</span> $response;
+ <span style="color: #0000ff">?&gt;</span>
+</pre></td></tr></table> <h4 class="text-right">
+            <a href="#top">Back to Top</a>
+          </h4></div>
+
+          </div>
+          <div ng-show="exampleActive==2">
+            <h4 class="list-group-item-heading">
+              <a href="" target="_blank">op/file/upload example</a>
+            </h4>
+            </br>
+             <!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .1em;padding:.2em .6em;"><table><tr><td><pre style="margin: 0; line-height: 125%"> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19</pre></td><td><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">&lt;?php</span>
+   <span style="color: #008000"># $uuid = op/authentication/login-ldap</span>
+ 
+   $curl = curl_init(<span style="color: #a31515">&#39;http://<span id="hostExUploadPHP"></span>op/file/upload&#39;</span>);
+   <span style="color: #008000">#curl_setopt($curl, CURLOPT_HTTPHEADER, array(&#39;Content-Type: multipart/form-data&#39;,&#39;Accept: application/xml&#39;));</span>
+   curl_setopt($curl, CURLOPT_HTTPHEADER, <span style="color: #0000ff">array</span>(<span style="color: #a31515">&#39;Content-Type: multipart/form-data&#39;</span>,<span style="color: #a31515">&#39;Accept: application/json&#39;</span>));
+   curl_setopt($curl, CURLOPT_POST, <span style="color: #0000ff">true</span>);
+   curl_setopt($curl, CURLOPT_POSTFIELDS, <span style="color: #0000ff">array</span>(<span style="color: #a31515">&#39;uuid&#39;</span> =&gt; <span style="color: #a31515">&#39;$uuid&#39;</span>, <span style="color: #a31515">&#39;service&#39;</span> =&gt; <span style="color: #a31515">&#39;SERVICE&#39;</span>,<span style="color: #a31515">&#39;project&#39;</span> =&gt; <span style="color: #a31515">&#39;PROJECT&#39;</span>, <span style="color: #a31515">&#39;parents&#39;</span> =&gt; <span style="color: #a31515">&#39;parents&#39;</span>, <span style="color: #a31515">&#39;file&#39;</span> =&gt; <span style="color: #a31515">&#39;@/filePath&#39;</span>, <span style="color: #a31515">&#39;override&#39;</span> =&gt; <span style="color: #a31515">&#39;true&#39;</span>));
+   curl_setopt($curl, CURLOPT_RETURNTRANSFER, <span style="color: #0000ff">true</span>);
+   $curl_response = curl_exec($curl);
+   curl_close($curl); 
+
+   $obj = json_decode($curl_response);
+   $code = $obj-&gt;{<span style="color: #a31515">&#39;code&#39;</span>};
+   <span style="color: #0000ff">if</span>($code==200){
+     <span style="color: #0000ff">echo</span> <span style="color: #a31515">&#39;SUCCESS &lt;br&gt;&#39;</span> ;
+     <span style="color: #0000ff">echo</span> <span style="color: #a31515">&#39;&lt;br&gt;&#39;</span>;
+   }
+<span style="color: #0000ff">?&gt;</span>
+</pre></td></tr></table>
+<h4 class="text-right">
+            <a href="#top">Back to Top</a>
+          </h4></div>
+
+          
+
+          
+          </div>
+          <div ng-show="exampleActive==3">
+            <h4 class="list-group-item-heading">
+              <a href="" target="_blank">op/file/download example</a>
+            </h4>
+            </br>
+            <!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .1em;padding:.2em .6em;"><table><tr><td><pre style="margin: 0; line-height: 125%"> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28</pre></td><td><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">&lt;?php</span> 
+    <span style="color: #008000"># $uuid = op/authentication/login-ldap</span>
+    
+    $url = <span style="color: #a31515">&#39;http://<span id="hostExDownloadPHP"></span>op/file/download&#39;</span>;
+    $data = <span style="color: #0000ff">array</span>(
+     <span style="color: #a31515">&#39;uuid&#39;</span>=&gt; $uuid,
+     <span style="color: #a31515">&#39;service&#39;</span>=&gt; <span style="color: #a31515">&#39;SERVICE&#39;</span>,
+     <span style="color: #a31515">&#39;project&#39;</span>=&gt; <span style="color: #a31515">&#39;PROJECT&#39;</span>,
+     <span style="color: #a31515">&#39;parents&#39;</span>=&gt; <span style="color: #a31515">&#39;parents&#39;</span>,
+     <span style="color: #a31515">&#39;file&#39;</span>=&gt; <span style="color: #a31515">&#39;fileName&#39;</span>
+    );
+
+    $headers = <span style="color: #0000ff">array</span>(
+      <span style="color: #a31515">&#39;Accept: application/octet-stream&#39;</span>
+    );
+    
+    $handle = curl_init();
+    curl_setopt($handle, CURLOPT_URL, $url);
+    curl_setopt($handle, CURLOPT_HTTPHEADER, $headers);
+    curl_setopt($handle, CURLOPT_RETURNTRANSFER, <span style="color: #0000ff">true</span>);
+    curl_setopt($handle, CURLOPT_SSL_VERIFYHOST, <span style="color: #0000ff">false</span>);
+    curl_setopt($handle, CURLOPT_SSL_VERIFYPEER, <span style="color: #0000ff">false</span>);
+
+    curl_setopt($handle, CURLOPT_POST, <span style="color: #0000ff">true</span>);
+    curl_setopt($handle, CURLOPT_POSTFIELDS, http_build_query($data));
+
+    $response = curl_exec($handle);
+ <span style="color: #0000ff">?&gt;</span>
+</pre></td></tr></table>
+<h4 class="text-right">
+            <a href="#top">Back to Top</a>
+          </h4></div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div ng-show="tabActive==3">
+      <legend class="scheduler-border" id="python exemples">Python Examples</legend>
+      <div class="list-group" ng-init="exampleActive=1">
+        <ul class="nav nav-tabs">
+          <li ng-class="{active: exampleActive==1}">
+            <a href="#java" ng-click="exampleActive=1">Login</a>
+          </li>
+          <li ng-class="{active: exampleActive==2}">
+            <a href="#php" ng-click="exampleActive=2">Upload</a>
+          </li>
+          <li ng-class="{active: exampleActive==3}">
+            <a href="#python" ng-click="exampleActive=3">Download</a>
+          </li>
+        </ul>
+        <div class="list-group-item">
+          <div ng-show="exampleActive==1">
+            <h4 class="list-group-item-heading">
+              <a href="" target="_blank">op/authentication/login example</a>
+            </h4>
+            </br>
+            <!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .1em;padding:.2em .6em;"><table><tr><td><pre style="margin: 0; line-height: 125%"> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14</pre></td><td><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">import</span> urllib
+<span style="color: #0000ff">import</span> urllib2
+
+url = <span style="color: #a31515">&#39;http://<span id="hostExLoginPYTHON"></span>op/authentication/login-ldap&#39;</span>
+params = urllib.urlencode({
+  <span style="color: #a31515">&#39;username&#39;</span>: <span style="color: #a31515">&#39;username&#39;</span>,
+  <span style="color: #a31515">&#39;password&#39;</span>: <span style="color: #a31515">&#39;password&#39;</span>,
+  <span style="color: #a31515">&#39;service&#39;</span>: <span style="color: #a31515">&#39;service&#39;</span>
+})
+headers = {<span style="color: #a31515">&#39;Accept&#39;</span> : <span style="color: #a31515">&#39;application/xml&#39;</span>}
+<span style="color: #008000">#headers = {&#39;Accept&#39; : &#39;application/json&#39;}</span>
+req = urllib2.Request(url, params, headers)
+response = urllib2.urlopen(req).read()
+<span style="color: #0000ff">print</span> response
+</pre></td></tr></table>
+          <h4 class="text-right">
+            <a href="#top">Back to Top</a>
+          </h4></div>
+
+          </div>
+          <div ng-show="exampleActive==2">
+            <h4 class="list-group-item-heading">
+              <a href="" target="_blank">op/file/upload example</a>
+            </h4>
+            </br>
+             <!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .1em;padding:.2em .6em;"><table><tr><td><pre style="margin: 0; line-height: 125%"> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15</pre></td><td><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">from</span> poster.encode <span style="color: #0000ff">import</span> multipart_encode
+<span style="color: #0000ff">from</span> poster.streaminghttp <span style="color: #0000ff">import</span> register_openers
+<span style="color: #0000ff">import</span> urllib2
+<span style="color: #0000ff">import</span> urllib
+<span style="color: #0000ff">import</span> json
+
+<span style="color: #008000">#uuid = op/authentication/login-ldap</span>
+
+register_openers()
+url = <span style="color: #a31515">&quot;http://<span id="hostExUploadPYTHON"></span>op/file/upload&quot;</span>
+data, headers = multipart_encode({<span style="color: #a31515">&quot;uuid&quot;</span> : uuid, <span style="color: #a31515">&quot;service&quot;</span> : <span style="color: #a31515">&quot;SERVICE&quot;</span>, <span style="color: #a31515">&quot;project&quot;</span> : <span style="color: #a31515">&quot;PROJECT&quot;</span>,<span style="color: #a31515">&quot;file&quot;</span>: open(<span style="color: #a31515">&#39;file_test.txt&#39;</span>, <span style="color: #a31515">&#39;r+&#39;</span>), <span style="color: #a31515">&quot;override&quot;</span> : <span style="color: #a31515">&quot;false&quot;</span>})
+headers.update({<span style="color: #a31515">&quot;Accept&quot;</span> : <span style="color: #a31515">&quot;application/json&quot;</span>})
+<span style="color: #008000">#headers.update({"Accept" : "application/xml"})</span>
+request = urllib2.Request(url, data, headers)
+<span style="color: #0000ff">print</span> urllib2.urlopen(request).read()
+</pre></td></tr></table>
+          <h4 class="text-right">
+            <a href="#top">Back to Top</a>
+          </h4></div>
+
+
+          
+          </div>
+          <div ng-show="exampleActive==3">
+            <h4 class="list-group-item-heading">
+              <a href="" target="_blank">op/file/download example</a>
+            </h4>
+            </br>
+            <!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .1em;padding:.2em .6em;"><table><tr><td><pre style="margin: 0; line-height: 125%"> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18</pre></td><td><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">import</span> urllib
+<span style="color: #0000ff">import</span> urllib2
+
+<span style="color: #008000">#uuid = op/authentication/login-ldap</span>
+
+url = <span style="color: #a31515">&#39;http://<span id="hostExDownloadPYTHON"></span>op/file/download&#39;</span>
+params = urllib.urlencode({
+  <span style="color: #a31515">&#39;uuid&#39;</span>: uuid,
+  <span style="color: #a31515">&#39;service&#39;</span>: <span style="color: #a31515">&#39;SERVICE&#39;</span>,
+  <span style="color: #a31515">&#39;project&#39;</span>: <span style="color: #a31515">&#39;PROJECT&#39;</span>,
+  <span style="color: #a31515">&#39;parents&#39;</span>: <span style="color: #a31515">&#39;parents&#39;</span>
+  <span style="color: #a31515">&#39;file&#39;</span>: <span style="color: #a31515">&#39;fileName&#39;</span>
+})
+
+headers = {<span style="color: #a31515">&#39;Accept&#39;</span> : <span style="color: #a31515">&#39;application/octet-stream&#39;</span>}
+req = urllib2.Request(url, params, headers)
+
+response = urllib2.urlopen(req).read()
+</pre></td></tr></table>
+          <h4 class="text-right">
+            <a href="#top">Back to Top</a>
+          </h4></div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </fieldset>
+</div>
+
+
+<script type="text/javascript">
+	var host = window.location.host + window.location.pathname;
+	document.getElementById("hostExLoginJAVA").innerHTML = host;
+	document.getElementById("hostExUploadJAVA").innerHTML = host;
+	document.getElementById("hostExDownloadJAVA").innerHTML = host;
+	document.getElementById("hostExLoginPHP").innerHTML = host;
+	document.getElementById("hostExUploadPHP").innerHTML = host;
+	document.getElementById("hostExDownloadPHP").innerHTML = host;
+	document.getElementById("hostExLoginPYTHON").innerHTML = host;
+	document.getElementById("hostExUploadPYTHON").innerHTML = host;
+	document.getElementById("hostExDownloadPYTHON").innerHTML = host;
+</script>
+
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<div ng-show="result.uuid == null">
+  <fieldset class="scheduler-border">
+    <label>Login Method</label>
+    <div class="input-group">
+      <span class="input-group-addon">
+        <input type="checkbox" id="ldapCheckbox" ng-click="selectMethod('ldap')" name="ldapAvaliable" onclick="" />
+      </span>
+      <input type="text" class="form-control" disabled="disabled" value="LDAP">
+    </div>
+    <div class="input-group">
+      <span class="input-group-addon">
+        <input type="checkbox" id="rsaCheckbox" ng-click="selectMethod('rsa')" name="rsaAvaliable" />
+      </span>
+      <input type="text" class="form-control" disabled="disabled" value="RSA">
+    </div>
+  </fieldset>
+  <fieldset ng-show="ldapIsSelected">
+    <legend>Login LDAP</legend>
+    <label for="username">Username:</label>
+    <input type="text" id="usernameLDAP" name="username" value="">
+    <br>
+    <label for="password">Password:</label>
+    <input type="password" id="passwordLDAP" name="password" value="">
+    <br>
+    <label for="service">Service:</label>
+    <input type="text" id="serviceLDAP" name="service" value="">
+    <br>
+    <button ng-click="doLoginLDAP()">Login</button>
+  </fieldset>
+  <fieldset ng-show="rsaIsSelected">
+    <legend>Login RSA</legend>
+    <label for="username">Username:</label>
+    <input type="text" id="usernameRSA" name="username" value="">
+    <br>
+    <label for="file">File:</label>
+    <input type="file" id="fileRSA" name="file" />
+    <br>
+    <label for="service">Service:</label>
+    <input type="text" id="serviceRSA" name="service" value="">
+    <br>
+    <button ng-click="doLoginRSA()">Login</button>
+  </fieldset>
+</div>
+
+<div ng-show="result.code==591" class="alert alert-danger" role="alert">User Not Authorized.</div>
+<div ng-show="result.code==404" class="alert alert-danger" role="alert">Service Not Found.</div>
+<div ng-show="result.code==200" class="alert alert-success" role="alert">Success!</div>

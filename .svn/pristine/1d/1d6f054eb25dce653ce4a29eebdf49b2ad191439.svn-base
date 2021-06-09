@@ -1,0 +1,15 @@
+<services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="services.xsd">
+	<service>
+		<id>CSGrid</id>
+		<configuration-service>br.lncc.sinapad.adapter.csgrid.configuration.CSGridConfigurationService</configuration-service>
+		<application-service>br.lncc.sinapad.adapter.csgrid.application.CSGridApplicationService</application-service>
+		<application-converter-service>br.lncc.sinapad.adapter.csgrid.application.converter.CSGridApplicationConverter</application-converter-service>
+		<authentication-service>br.lncc.sinapad.adapter.csgrid.authentication.CSGridAuthenticationService</authentication-service>
+		<file-service>br.lncc.sinapad.adapter.csgrid.file.CSGridFileService</file-service>
+		<job-monitoring-service>br.lncc.sinapad.adapter.csgrid.monitoring.CSGridJobMonitoringService</job-monitoring-service>
+		<resource-monitoring-service>br.lncc.sinapad.adapter.csgrid.monitoring.CSGridResourceMonitoringService</resource-monitoring-service>
+		<job-submission-service>br.lncc.sinapad.adapter.csgrid.submission.CSGridJobSubmissionService</job-submission-service>
+	</service>	
+</services>
+

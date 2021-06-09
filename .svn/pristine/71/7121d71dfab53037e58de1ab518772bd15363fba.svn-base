@@ -1,0 +1,7 @@
+br.lncc.sinapad.rest.application
+br.lncc.sinapad.rest.authentication
+br.lncc.sinapad.rest.data
+br.lncc.sinapad.rest.file
+br.lncc.sinapad.rest.monitoring
+br.lncc.sinapad.rest.submission
+br.lncc.sinapad.rest.utils

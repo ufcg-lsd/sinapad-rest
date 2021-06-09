@@ -1,0 +1,120 @@
+package br.lncc.sinapad.rest.authentication;
+
+import java.util.UUID;
+
+import br.lncc.sinapad.rest.RestOperationTest;
+import br.lncc.sinapad.rest.data.AuthenticationResult;
+import br.lncc.sinapad.rest.data.Result;
+import br.lncc.sinapad.rest.data.UserResult;
+import br.lncc.sinapad.rest.utils.RESTResultCodes;
+
+public class AuthenticationRestOperationTest extends RestOperationTest {
+
+	AuthenticationRESTOperation rest = new AuthenticationRESTOperation();
+
+	public void testLoginSuccess() {
+		AuthenticationResult result = rest.loginLDAP(service, usernameValid, passwordValid);
+		assertEquals(RESTResultCodes.OK, result.getCode());
+	}
+
+	public void testLoginErrorAccessDenied() {
+		AuthenticationResult result = rest.loginLDAP(service, usernameInvalid, passwordInvalid);
+		assertEquals(RESTResultCodes.NOT_AUTHORIZED, result.getCode());
+	}
+
+	public void testLoginErrorAccessDeniedWrongPassword() {
+		AuthenticationResult result = rest.loginLDAP(service, usernameValid, passwordInvalid);
+		assertEquals(RESTResultCodes.NOT_AUTHORIZED, result.getCode());
+	}
+
+	public void testLoginErrorAccessDeniedWrongUserName() {
+		AuthenticationResult result = rest.loginLDAP(service, usernameInvalid, passwordValid);
+		assertEquals(RESTResultCodes.NOT_AUTHORIZED, result.getCode());
+	}
+
+	public void testLoginErrorNull() {
+		AuthenticationResult result = rest.loginLDAP(service, usernameValid, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.loginLDAP(service, passwordValid, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.loginLDAP(usernameValid, passwordInvalid, null);
+		assertEquals(RESTResultCodes.SERVICE_NOT_FOUND, result.getCode());
+
+		result = rest.loginLDAP(null, null, null);
+		assertEquals(RESTResultCodes.SERVICE_NOT_FOUND, result.getCode());
+	}
+
+	public void testLoginErrorInvalidServiceName() {
+		String invalidServiceName = UUID.randomUUID().toString();
+		AuthenticationResult result = rest.loginLDAP(invalidServiceName, usernameValid, passwordValid);
+		assertEquals(RESTResultCodes.SERVICE_NOT_FOUND, result.getCode());
+	}
+
+	public void testLogoutSuccess() {
+		AuthenticationRESTOperation authentication = new AuthenticationRESTOperation();
+		AuthenticationResult authenticationResult = authentication.loginLDAP(service, usernameValid, passwordValid);
+		String uuid = authenticationResult.getUuid();
+		Result result = rest.logout(service, uuid);
+		assertEquals(RESTResultCodes.OK, result.getCode());
+	}
+
+	// public void testLogoutUserNotAuthorized() {
+	// String invalidUUID = UUID.randomUUID().toString();
+	// Result result = rest.logout(invalidUUID);
+	// assertEquals(RESTResultCodes.USER_NOT_AUTHORIZED, result.getCode());
+	// }
+
+	public void testLogoutErrorNull() {
+		String uuid = UUID.randomUUID().toString();
+		Result result = rest.logout(null, uuid);
+		assertEquals(RESTResultCodes.SERVICE_NOT_FOUND, result.getCode());
+
+		result = rest.logout(service, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.logout(null, null);
+		assertEquals(RESTResultCodes.SERVICE_NOT_FOUND, result.getCode());
+	}
+
+	public void testLogoutErrorInvalidServiceName() {
+		String invalidServiceName = UUID.randomUUID().toString();
+		Result result = rest.logout(invalidServiceName, userUUIDValid);
+		assertEquals(RESTResultCodes.SERVICE_NOT_FOUND, result.getCode());
+	}
+
+	public void testInfoSuccess() {
+		AuthenticationResult loginResult = rest.loginLDAP(service, usernameValid, passwordValid);
+		assertEquals(RESTResultCodes.OK, loginResult.getCode());
+
+		UserResult result = rest.info(service, loginResult.getUuid());
+		assertEquals(RESTResultCodes.OK, result.getCode());
+	}
+
+	public void testInfoErrorNull() {
+		String uuid = UUID.randomUUID().toString();
+
+		UserResult result = rest.info(null, uuid);
+		assertEquals(RESTResultCodes.SERVICE_NOT_FOUND, result.getCode());
+
+		result = rest.info(service, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.info(null, null);
+		assertEquals(RESTResultCodes.SERVICE_NOT_FOUND, result.getCode());
+	}
+
+	public void testInfoUserNotLogged() {
+		String invalidUUID = UUID.randomUUID().toString();
+		UserResult result = rest.info(service, invalidUUID);
+		assertEquals(RESTResultCodes.NOT_AUTHORIZED, result.getCode());
+	}
+
+	public void testInfoErrorInvalidServiceName() {
+		String invalidServiceName = UUID.randomUUID().toString();
+		Result result = rest.logout(invalidServiceName, userUUIDValid);
+		assertEquals(RESTResultCodes.SERVICE_NOT_FOUND, result.getCode());
+	}
+
+}

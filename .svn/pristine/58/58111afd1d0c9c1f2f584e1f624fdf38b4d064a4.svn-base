@@ -1,0 +1,136 @@
+package br.lncc.sinapad.rest.application;
+
+import java.util.UUID;
+
+import javax.ws.rs.core.Response;
+
+import br.lncc.sinapad.rest.RestOperationTest;
+import br.lncc.sinapad.rest.data.ApplicationResult;
+import br.lncc.sinapad.rest.data.ListApplicationResult;
+import br.lncc.sinapad.rest.utils.RESTResultCodes;
+
+public class ApplicationRestOperationTest extends RestOperationTest {
+
+	private ApplicationRESTOperation rest = new ApplicationRESTOperation();
+
+	public void testListSuccess() {
+		ListApplicationResult result;
+		result = rest.list(service, userUUIDValid);
+
+		assertEquals(RESTResultCodes.OK, result.getCode());
+	}
+
+	public void testListErrorUserNotFound() {
+		String invalidUUID = UUID.randomUUID().toString();
+		ListApplicationResult result;
+		result = rest.list(service, invalidUUID);
+
+		assertEquals(RESTResultCodes.NOT_AUTHORIZED, result.getCode());
+	}
+
+	public void testListErrorNull() {
+		ListApplicationResult result;
+		result = rest.list(service, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.list(null, userUUIDValid);
+		assertEquals(RESTResultCodes.SERVICE_NOT_FOUND, result.getCode());
+
+		result = rest.list(null, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+	}
+
+	public void testListErrorInvalidService() {
+		String invalidServiceName = UUID.randomUUID().toString();
+		ListApplicationResult result = rest.list(invalidServiceName, userUUIDValid);
+
+		assertEquals(RESTResultCodes.SERVICE_NOT_FOUND, result.getCode());
+	}
+
+	public void testGetSuccess() {
+		ApplicationResult result;
+		result = rest.get(service, userUUIDValid, applicationValid);
+
+		assertEquals(RESTResultCodes.OK, result.getCode());
+	}
+
+	public void testGetErrorUserNotAuthorized() {
+		String invalidUUID = UUID.randomUUID().toString();
+		ApplicationResult result;
+		result = rest.get(service, invalidUUID, applicationValid);
+
+		assertEquals(RESTResultCodes.NOT_AUTHORIZED, result.getCode());
+	}
+
+	public void testGetErrorApplicationNotFound() {
+		ApplicationResult result = rest.get(service, userUUIDValid, applicationInvalid);
+		assertEquals(RESTResultCodes.NOT_AUTHORIZED, result.getCode());
+	}
+
+	public void testGetErrorNull() {
+		ApplicationResult result = rest.get(service, null, userUUIDValid);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.get(service, null, applicationValid);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.get(null, null, null);
+		assertEquals(RESTResultCodes.SERVICE_NOT_FOUND, result.getCode());
+	}
+
+	public void testGetErrorInvalidServiceName() {
+		String invalidServiceName = UUID.randomUUID().toString();
+		ApplicationResult result = rest.get(invalidServiceName, userUUIDValid, applicationInvalid);
+		assertEquals(RESTResultCodes.SERVICE_NOT_FOUND, result.getCode());
+	}
+
+	public void testConfigSuccess() {
+		Response response = rest.config(service, userUUIDValid, applicationValid, versionValid);
+		assertEquals(RESTResultCodes.OK, response.getStatus());
+	}
+
+	public void testConfigErrorUserNotAuthorized() {
+		String invalidUUID = UUID.randomUUID().toString();
+		Response response = rest.config(service, invalidUUID, applicationValid, versionValid);
+		assertEquals(RESTResultCodes.NO_CONTENT, response.getStatus());
+	}
+
+	public void testConfigErrorInvalidApplication() {
+		Response response = rest.config(service, userUUIDValid, applicationInvalid, versionValid);
+		assertEquals(RESTResultCodes.NO_CONTENT, response.getStatus());
+	}
+
+	public void testConfigErrorInvalidVersion() {
+		Response response = rest.config(service, userUUIDValid, applicationValid, versionInvalid);
+		assertEquals(RESTResultCodes.NO_CONTENT, response.getStatus());
+	}
+
+	public void testConfigErrorNull() {
+		Response response = rest.config(service, userUUIDValid, applicationValid, null);
+		assertEquals(RESTResultCodes.NO_CONTENT, response.getStatus());
+
+		response = rest.config(service, null, userUUIDValid, versionValid);
+		assertEquals(RESTResultCodes.NO_CONTENT, response.getStatus());
+
+		response = rest.config(service, null, userUUIDValid, null);
+		assertEquals(RESTResultCodes.NO_CONTENT, response.getStatus());
+
+		response = rest.config(service, null, applicationValid, versionValid);
+		assertEquals(RESTResultCodes.NO_CONTENT, response.getStatus());
+
+		response = rest.config(service, null, applicationValid, null);
+		assertEquals(RESTResultCodes.NO_CONTENT, response.getStatus());
+
+		response = rest.config(service, null, null, versionValid);
+		assertEquals(RESTResultCodes.NO_CONTENT, response.getStatus());
+
+		response = rest.config(null, null, null, null);
+		assertEquals(RESTResultCodes.NO_CONTENT, response.getStatus());
+	}
+
+	public void testConfigErrorInvalidServiceName() {
+		String invalidServiceName = UUID.randomUUID().toString();
+		Response response = rest.config(invalidServiceName, userUUIDValid, applicationValid, versionValid);
+		assertEquals(RESTResultCodes.NO_CONTENT, response.getStatus());
+	}
+}

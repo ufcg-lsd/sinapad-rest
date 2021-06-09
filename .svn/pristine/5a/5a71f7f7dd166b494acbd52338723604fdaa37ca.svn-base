@@ -1,0 +1,693 @@
+package br.lncc.sinapad.rest.monitoring;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
+
+import javax.ws.rs.core.Response;
+
+import br.lncc.sinapad.core.data.ResultData.Status;
+import br.lncc.sinapad.core.exception.NotAuthorizedException;
+import br.lncc.sinapad.core.exception.ServiceException;
+import br.lncc.sinapad.core.exception.UnexpectedException;
+import br.lncc.sinapad.rest.RestOperationTest;
+import br.lncc.sinapad.rest.data.FileResult;
+import br.lncc.sinapad.rest.data.JobSubmissonResult;
+import br.lncc.sinapad.rest.data.ListStatusResult;
+import br.lncc.sinapad.rest.data.Result;
+import br.lncc.sinapad.rest.data.StatusResult;
+import br.lncc.sinapad.rest.exception.ServiceNotFoundException;
+import br.lncc.sinapad.rest.file.FileRESTOperation;
+import br.lncc.sinapad.rest.submission.JobSubmissionRESTOperation;
+import br.lncc.sinapad.rest.utils.RESTResultCodes;
+
+public class JobMonitoringRestOperationTest extends RestOperationTest {
+
+	JobMonitoringRESTOperation rest = new JobMonitoringRESTOperation();
+	JobSubmissionRESTOperation jobSubmissionRest = new JobSubmissionRESTOperation();
+	FileRESTOperation fileRest = new FileRESTOperation();
+
+	public void testListSuccess() {
+		ListStatusResult result = rest.list(service, userUUIDValid, projectValid, null, null, null);
+		assertEquals(RESTResultCodes.OK, result.getCode());
+
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddhhmmss");
+
+		Calendar c = Calendar.getInstance();
+		c.setTime(new Date());
+		Date d = c.getTime();
+		String to = sdf.format(d);
+
+		c.add(Calendar.DATE, -1);
+		d = c.getTime();
+		String from = sdf.format(d);
+
+		result = rest.list(service, userUUIDValid, projectValid, from, to, null);
+		assertEquals(RESTResultCodes.OK, result.getCode());
+
+		result = rest.list(service, userUUIDValid, projectValid, from, null, null);
+		assertEquals(RESTResultCodes.OK, result.getCode());
+
+		result = rest.list(service, userUUIDValid, projectValid, null, to, null);
+		assertEquals(RESTResultCodes.OK, result.getCode());
+	}
+
+	public void testListErrorProjectNotFound() {
+		ListStatusResult result = rest.list(service, userUUIDValid, projectInvalid, null, null, null);
+		assertEquals(RESTResultCodes.PROJECT_NOT_FOUND, result.getCode());
+	}
+
+	public void testListErrorUserNotAuthorized() {
+		String invalidUUID = UUID.randomUUID().toString();
+		ListStatusResult result = rest.list(service, invalidUUID, projectValid, null, null, null);
+		assertEquals(RESTResultCodes.NOT_AUTHORIZED, result.getCode());
+	}
+
+	public void testListErrorNull() {
+		ListStatusResult result = rest.list(service, null, userUUIDValid, null, null, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.list(service, null, projectValid, null, null, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.list(null, null, projectValid, null, null, null);
+		assertEquals(RESTResultCodes.SERVICE_NOT_FOUND, result.getCode());
+	}
+
+	public void testListErrorInvalidServiceName() {
+		String invalidServiceName = UUID.randomUUID().toString();
+		ListStatusResult result = rest.list(invalidServiceName, userUUIDValid, projectValid, null, null, null);
+		assertEquals(RESTResultCodes.SERVICE_NOT_FOUND, result.getCode());
+	}
+
+	public void testGetSuccess() {
+		JobSubmissonResult jobResult = null;
+		try {
+			String parameters = loadParameters();
+
+			jobResult = jobSubmissionRest.run(service, userUUIDValid, projectValid, applicationValid, versionValid, null, parameters, null, null);
+			assertEquals(RESTResultCodes.OK, jobResult.getCode());
+
+			StatusResult status = rest.get(service, userUUIDValid, projectValid, jobResult.getJobId(), null);
+			assertEquals(RESTResultCodes.OK, status.getCode());
+		} catch (Exception e) {
+			assertTrue(false);
+		} finally {
+			try {
+				StatusResult statusResult;
+				do {
+					statusResult = rest.get(service, userUUIDValid, projectValid, jobResult.getJobId(), null);
+					if (statusResult.getStatus().equals(Status.FAILED) || statusResult.getStatus().equals(Status.UNDETERMINED)) {
+						assertTrue(false);
+					}
+				} while (!statusResult.getStatus().equals(Status.DONE));
+
+				result = rest.delete(service, userUUIDValid, projectValid, jobResult.getJobId(), null);
+				assertEquals(RESTResultCodes.OK, result.getCode());
+
+				clearParameters();
+			} catch (ServiceException e) {
+				assertTrue(false);
+			} catch (ServiceNotFoundException e) {
+				assertTrue(false);
+			} catch (NotAuthorizedException e) {
+				assertTrue(false);
+			} catch (UnexpectedException e) {
+				assertTrue(false);
+			}
+		}
+	}
+
+	public void testGetErrorUserNotAuthorized() {
+		String invalidUUID = UUID.randomUUID().toString();
+		JobSubmissonResult jobResult = null;
+		try {
+			String parameters = loadParameters();
+
+			jobResult = jobSubmissionRest.run(service, userUUIDValid, projectValid, applicationValid, versionValid, null, parameters, null, null);
+			assertEquals(RESTResultCodes.OK, jobResult.getCode());
+
+			StatusResult status = rest.get(service, invalidUUID, projectValid, jobResult.getJobId(), null);
+			assertEquals(RESTResultCodes.NOT_AUTHORIZED, status.getCode());
+		} catch (Exception e) {
+			assertTrue(false);
+		} finally {
+			try {
+				StatusResult statusResult;
+				do {
+					statusResult = rest.get(service, userUUIDValid, projectValid, jobResult.getJobId(), null);
+					if (statusResult.getStatus().equals(Status.FAILED) || statusResult.getStatus().equals(Status.UNDETERMINED)) {
+						assertTrue(false);
+					}
+				} while (!statusResult.getStatus().equals(Status.DONE));
+
+				result = rest.delete(service, userUUIDValid, projectValid, jobResult.getJobId(), null);
+				assertEquals(RESTResultCodes.OK, result.getCode());
+
+				clearParameters();
+			} catch (Exception e) {
+				assertTrue(false);
+			}
+		}
+	}
+
+	public void testGetErrorStatusWasNotFound() {
+		String invalidJobId = UUID.randomUUID().toString();
+		StatusResult result = rest.get(service, userUUIDValid, projectValid, invalidJobId, null);
+		assertEquals(RESTResultCodes.JOB_DOES_NOT_EXIST, result.getCode());
+	}
+
+	public void testGetErrorNull() {
+		String invalidJobId = UUID.randomUUID().toString();
+		StatusResult result = rest.get(service, userUUIDValid, projectValid, null, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.get(service, null, userUUIDValid, invalidJobId, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.get(service, null, userUUIDValid, null, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.get(service, null, projectValid, invalidJobId, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.get(null, null, projectValid, invalidJobId, null);
+		assertEquals(RESTResultCodes.SERVICE_NOT_FOUND, result.getCode());
+	}
+
+	public void testGetErrorInvalidServiceName() {
+		String invalidServiceName = UUID.randomUUID().toString();
+		StatusResult result = rest.get(invalidServiceName, userUUIDValid, projectValid, null, null);
+		assertEquals(RESTResultCodes.SERVICE_NOT_FOUND, result.getCode());
+	}
+	
+	public void testStatusSuccess() {
+		JobSubmissonResult jobResult = null;
+		try {
+			String parameters = loadParameters();
+
+			jobResult = jobSubmissionRest.run(service, userUUIDValid, projectValid, applicationValid, versionValid, null, parameters, null, null);
+			assertEquals(RESTResultCodes.OK, jobResult.getCode());
+
+			StatusResult status = rest.status(service, userUUIDValid, projectValid, jobResult.getJobId(), null);
+			assertEquals(RESTResultCodes.OK, status.getCode());
+		} catch (Exception e) {
+			assertTrue(false);
+		} finally {
+			try {
+				StatusResult statusResult;
+				do {
+					statusResult = rest.status(service, userUUIDValid, projectValid, jobResult.getJobId(), null);
+					if (statusResult.getStatus().equals(Status.FAILED) || statusResult.getStatus().equals(Status.UNDETERMINED)) {
+						assertTrue(false);
+					}
+				} while (!statusResult.getStatus().equals(Status.DONE));
+
+				result = rest.delete(service, userUUIDValid, projectValid, jobResult.getJobId(), null);
+				assertEquals(RESTResultCodes.OK, result.getCode());
+
+				clearParameters();
+			} catch (ServiceException e) {
+				assertTrue(false);
+			} catch (ServiceNotFoundException e) {
+				assertTrue(false);
+			} catch (NotAuthorizedException e) {
+				assertTrue(false);
+			} catch (UnexpectedException e) {
+				assertTrue(false);
+			}
+		}
+	}
+
+	public void testStatusErrorUserNotAuthorized() {
+		String invalidUUID = UUID.randomUUID().toString();
+		JobSubmissonResult jobResult = null;
+		try {
+			String parameters = loadParameters();
+
+			jobResult = jobSubmissionRest.run(service, userUUIDValid, projectValid, applicationValid, versionValid, null, parameters, null, null);
+			assertEquals(RESTResultCodes.OK, jobResult.getCode());
+
+			StatusResult status = rest.status(service, invalidUUID, projectValid, jobResult.getJobId(), null);
+			assertEquals(RESTResultCodes.NOT_AUTHORIZED, status.getCode());
+		} catch (Exception e) {
+			assertTrue(false);
+		} finally {
+			try {
+				StatusResult statusResult;
+				do {
+					statusResult = rest.status(service, userUUIDValid, projectValid, jobResult.getJobId(), null);
+					if (statusResult.getStatus().equals(Status.FAILED) || statusResult.getStatus().equals(Status.UNDETERMINED)) {
+						assertTrue(false);
+					}
+				} while (!statusResult.getStatus().equals(Status.DONE));
+
+				result = rest.delete(service, userUUIDValid, projectValid, jobResult.getJobId(), null);
+				assertEquals(RESTResultCodes.OK, result.getCode());
+
+				clearParameters();
+			} catch (Exception e) {
+				assertTrue(false);
+			}
+		}
+	}
+
+	public void testStatusErrorStatusWasNotFound() {
+		String invalidJobId = UUID.randomUUID().toString();
+		StatusResult result = rest.status(service, userUUIDValid, projectValid, invalidJobId, null);
+		assertEquals(RESTResultCodes.JOB_DOES_NOT_EXIST, result.getCode());
+	}
+
+	public void testStatusErrorNull() {
+		String invalidJobId = UUID.randomUUID().toString();
+		StatusResult result = rest.status(service, userUUIDValid, projectValid, null, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.status(service, null, userUUIDValid, invalidJobId, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.status(service, null, userUUIDValid, null, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.status(service, null, projectValid, invalidJobId, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.status(null, null, projectValid, invalidJobId, null);
+		assertEquals(RESTResultCodes.SERVICE_NOT_FOUND, result.getCode());
+	}
+
+	public void testStatusErrorInvalidServiceName() {
+		String invalidServiceName = UUID.randomUUID().toString();
+		StatusResult result = rest.status(invalidServiceName, userUUIDValid, projectValid, null, null);
+		assertEquals(RESTResultCodes.SERVICE_NOT_FOUND, result.getCode());
+	}
+
+	public void testDeleteSuccess() {
+		JobSubmissonResult jobResult = null;
+		try {
+			String parameters = loadParameters();
+
+			jobResult = jobSubmissionRest.run(service, userUUIDValid, projectValid, applicationValid, versionValid, null, parameters, null, null);
+			assertEquals(RESTResultCodes.OK, jobResult.getCode());
+		} catch (Exception e) {
+			assertTrue(false);
+		} finally {
+			try {
+				StatusResult statusResult;
+				do {
+					statusResult = rest.get(service, userUUIDValid, projectValid, jobResult.getJobId(), null);
+					if (statusResult.getStatus().equals(Status.FAILED) || statusResult.getStatus().equals(Status.UNDETERMINED)) {
+						assertTrue(false);
+					}
+				} while (!statusResult.getStatus().equals(Status.DONE));
+
+				result = rest.delete(service, userUUIDValid, projectValid, jobResult.getJobId(), null);
+				assertEquals(RESTResultCodes.OK, result.getCode());
+
+				clearParameters();
+			} catch (Exception e) {
+				assertTrue(false);
+			}
+		}
+	}
+
+	public void testDeleteUserNotAuthorized() {
+		String invalidUUID = UUID.randomUUID().toString();
+		JobSubmissonResult jobResult = null;
+		try {
+			String parameters = loadParameters();
+
+			jobResult = jobSubmissionRest.run(service, userUUIDValid, projectValid, applicationValid, versionValid, null, parameters, null, null);
+			assertEquals(RESTResultCodes.OK, jobResult.getCode());
+		} catch (Exception e) {
+			assertTrue(false);
+		} finally {
+			try {
+				StatusResult statusResult;
+				do {
+					statusResult = rest.get(service, userUUIDValid, projectValid, jobResult.getJobId(), null);
+					if (statusResult.getStatus().equals(Status.FAILED) || statusResult.getStatus().equals(Status.UNDETERMINED)) {
+						assertTrue(false);
+					}
+				} while (!statusResult.getStatus().equals(Status.DONE));
+				result = rest.delete(service, invalidUUID, projectValid, jobResult.getJobId(), null);
+				assertEquals(RESTResultCodes.NOT_AUTHORIZED, result.getCode());
+
+				result = rest.delete(service, userUUIDValid, projectValid, jobResult.getJobId(), null);
+				assertEquals(RESTResultCodes.OK, result.getCode());
+
+				clearParameters();
+			} catch (Exception e) {
+				assertTrue(false);
+			}
+		}
+	}
+
+	public void testDeleteErrorNotFound() {
+		String invalidJobId = UUID.randomUUID().toString();
+		Result result = rest.delete(service, userUUIDValid, projectValid, invalidJobId, null);
+		assertEquals(RESTResultCodes.JOB_DOES_NOT_EXIST, result.getCode());
+	}
+
+	public void testDeleteErrorNull() {
+		String invalidJobId = UUID.randomUUID().toString();
+		Result result = rest.delete(service, userUUIDValid, projectValid, null, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.delete(service, null, userUUIDValid, invalidJobId, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.delete(service, null, userUUIDValid, null, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.delete(service, null, projectValid, invalidJobId, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.delete(service, null, projectValid, null, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.delete(service, null, null, null, null);
+		assertEquals(RESTResultCodes.USER_ERROR, result.getCode());
+
+		result = rest.delete(null, null, null, null, null);
+		assertEquals(RESTResultCodes.SERVICE_NOT_FOUND, result.getCode());
+	}
+
+	public void testDeleteErrorInvalidServiceName() {
+		String invalidServiceName = UUID.randomUUID().toString();
+		Result result = rest.delete(invalidServiceName, userUUIDValid, projectValid, "", null);
+		assertEquals(RESTResultCodes.SERVICE_NOT_FOUND, result.getCode());
+	}
+
+	public void testLogSuccess() {
+		JobSubmissonResult jobResult = null;
+		try {
+			String parameters = loadParameters();
+
+			jobResult = jobSubmissionRest.run(service, userUUIDValid, projectValid, applicationValid, versionValid, null, parameters, null, null);
+			assertEquals(RESTResultCodes.OK, jobResult.getCode());
+
+			Response response = rest.log(service, userUUIDValid, projectValid, jobResult.getJobId(), null);
+			assertEquals(RESTResultCodes.OK, response.getStatus());
+		} catch (Exception e) {
+			assertTrue(false);
+		} finally {
+			try {
+				StatusResult statusResult;
+				do {
+					statusResult = rest.get(service, userUUIDValid, projectValid, jobResult.getJobId(), null);
+					if (statusResult.getStatus().equals(Status.FAILED) || statusResult.getStatus().equals(Status.UNDETERMINED)) {
+						assertTrue(false);
+					}
+				} while (!statusResult.getStatus().equals(Status.DONE));
+
+				result = rest.delete(service, userUUIDValid, projectValid, jobResult.getJobId(), null);
+				assertEquals(RESTResultCodes.OK, result.getCode());
+
+				clearParameters();
+			} catch (Exception e) {
+				assertTrue(false);
+			}
+		}
+	}
+
+	public void testLogErrorNoContent() {
+		String invalidJobId = UUID.randomUUID().toString();
+		Response response = rest.log(service, userUUIDValid, projectValid, invalidJobId, null);
+		assertEquals(RESTResultCodes.NO_CONTENT, response.getStatus());
+	}
+
+	public void testLogErrorNull() {
+		String invalidJobId = UUID.randomUUID().toString();
+		Response response = rest.log(service, userUUIDValid, projectValid, null, null);
+		assertEquals(RESTResultCodes.NO_CONTENT, response.getStatus());
+
+		response = rest.log(service, null, userUUIDValid, invalidJobId, null);
+		assertEquals(RESTResultCodes.NO_CONTENT, response.getStatus());
+
+		response = rest.log(service, null, userUUIDValid, null, null);
+		assertEquals(RESTResultCodes.NO_CONTENT, response.getStatus());
+
+		response = rest.log(service, null, projectValid, invalidJobId, null);
+		assertEquals(RESTResultCodes.NO_CONTENT, response.getStatus());
+
+		response = rest.log(service, null, projectValid, null, null);
+		assertEquals(RESTResultCodes.NO_CONTENT, response.getStatus());
+
+		response = rest.log(service, null, null, invalidJobId, null);
+		assertEquals(RESTResultCodes.NO_CONTENT, response.getStatus());
+
+		response = rest.log(service, null, null, null, null);
+		assertEquals(RESTResultCodes.NO_CONTENT, response.getStatus());
+
+		response = rest.log(null, null, null, null, null);
+		assertEquals(RESTResultCodes.NO_CONTENT, response.getStatus());
+	}
+
+	public void testLogErrorInvalidServiceName() {
+		String invalidServiceName = UUID.randomUUID().toString();
+		Response response = rest.log(invalidServiceName, userUUIDValid, projectValid, "", null);
+		assertEquals(RESTResultCodes.NO_CONTENT, response.getStatus());
+	}
+
+	public void testHistorySuccess() {
+		JobSubmissonResult jobResult = null;
+		try {
+			String parameters = loadParameters();
+
+			jobResult = jobSubmissionRest.run(service, userUUIDValid, projectValid, applicationValid, versionValid, null, parameters, null, null);
+			assertEquals(RESTResultCodes.OK, jobResult.getCode());
+
+			FileResult historyResult = rest.history(service, userUUIDValid, projectValid, jobResult.getJobId(), null, null, null);
+			assertEquals(RESTResultCodes.OK, historyResult.getCode());
+		} catch (Exception e) {
+			assertTrue(false);
+		} finally {
+			try {
+				StatusResult statusResult;
+				do {
+					statusResult = rest.get(service, userUUIDValid, projectValid, jobResult.getJobId(), null);
+					if (statusResult.getStatus().equals(Status.FAILED) || statusResult.getStatus().equals(Status.UNDETERMINED)) {
+						assertTrue(false);
+					}
+				} while (!statusResult.getStatus().equals(Status.DONE));
+
+				result = rest.delete(service, userUUIDValid, projectValid, jobResult.getJobId(), null);
+				assertEquals(RESTResultCodes.OK, result.getCode());
+				clearParameters();
+			} catch (Exception e) {
+				assertTrue(false);
+			}
+		}
+	}
+
+	public void testHistoryErrorProjectNotFound() {
+		JobSubmissonResult jobResult = null;
+		try {
+			String parameters = loadParameters();
+
+			jobResult = jobSubmissionRest.run(service, userUUIDValid, projectValid, applicationValid, versionValid, null, parameters, null, null);
+			assertEquals(RESTResultCodes.OK, jobResult.getCode());
+
+			FileResult historyResult = rest.history(service, userUUIDValid, projectInvalid, jobResult.getJobId(), null, null, null);
+			assertEquals(RESTResultCodes.PROJECT_NOT_FOUND, historyResult.getCode());
+		} catch (Exception e) {
+			assertTrue(false);
+		} finally {
+			try {
+				StatusResult statusResult;
+				do {
+					statusResult = rest.get(service, userUUIDValid, projectValid, jobResult.getJobId(), null);
+					if (statusResult.getStatus().equals(Status.FAILED) || statusResult.getStatus().equals(Status.UNDETERMINED)) {
+						assertTrue(false);
+					}
+				} while (!statusResult.getStatus().equals(Status.DONE));
+
+				result = rest.delete(service, userUUIDValid, projectValid, jobResult.getJobId(), null);
+				assertEquals(RESTResultCodes.OK, result.getCode());
+				clearParameters();
+			} catch (Exception e) {
+				assertTrue(false);
+			}
+		}
+	}
+
+	public void testHistoryErrorJobDoesNotExist() {
+		String invalidJobId = UUID.randomUUID().toString();
+		FileResult historyResult = rest.history(service, userUUIDValid, projectValid, invalidJobId, null, null, null);
+		assertEquals(RESTResultCodes.OK, historyResult.getCode());
+	}
+
+	public void testHistoryErrorFileDoesNotExist() {
+		String invalidJobId = UUID.randomUUID().toString();
+		String invalidFileName = "dir" + UUID.randomUUID().toString() + "test_rest";
+
+		FileResult historyResult = rest.history(service, userUUIDValid, projectValid, invalidJobId, null, invalidFileName, null);
+		assertEquals(RESTResultCodes.OK, historyResult.getCode());
+	}
+
+	public void testHistoryErrorUserNotAuthorized() {
+		String invalidUUID = UUID.randomUUID().toString();
+		JobSubmissonResult jobResult = null;
+		try {
+			String parameters = loadParameters();
+
+			jobResult = jobSubmissionRest.run(service, userUUIDValid, projectValid, applicationValid, versionValid, null, parameters, null, null);
+			assertEquals(RESTResultCodes.OK, jobResult.getCode());
+
+			FileResult historyResult = rest.history(service, invalidUUID, projectValid, jobResult.getJobId(), null, null, null);
+			assertEquals(RESTResultCodes.NOT_AUTHORIZED, historyResult.getCode());
+		} catch (Exception e) {
+			assertTrue(false);
+		} finally {
+			try {
+				StatusResult statusResult;
+				do {
+					statusResult = rest.get(service, userUUIDValid, projectValid, jobResult.getJobId(), null);
+					if (statusResult.getStatus().equals(Status.FAILED) || statusResult.getStatus().equals(Status.UNDETERMINED)) {
+						assertTrue(false);
+					}
+				} while (!statusResult.getStatus().equals(Status.DONE));
+
+				result = rest.delete(service, userUUIDValid, projectValid, jobResult.getJobId(), null);
+				assertEquals(RESTResultCodes.OK, result.getCode());
+
+				clearParameters();
+			} catch (Exception e) {
+				assertTrue(false);
+			}
+		}
+	}
+
+	public void testHistoryErrorNull() {
+		String invalidJobId = UUID.randomUUID().toString();
+		String fileName = "dir" + UUID.randomUUID().toString() + "test_rest";
+
+		FileResult historyResult = rest.history(service, userUUIDValid, projectValid, null, null, fileName, null);
+		assertEquals(RESTResultCodes.USER_ERROR, historyResult.getCode());
+
+		historyResult = rest.history(service, null, userUUIDValid, invalidJobId, null, fileName, null);
+		assertEquals(RESTResultCodes.USER_ERROR, historyResult.getCode());
+
+		historyResult = rest.history(service, null, userUUIDValid, null, null, fileName, null);
+		assertEquals(RESTResultCodes.USER_ERROR, historyResult.getCode());
+
+		historyResult = rest.history(service, null, projectValid, invalidJobId, null, fileName, null);
+		assertEquals(RESTResultCodes.USER_ERROR, historyResult.getCode());
+
+		historyResult = rest.history(service, null, projectValid, null, null, fileName, null);
+		assertEquals(RESTResultCodes.USER_ERROR, historyResult.getCode());
+
+		historyResult = rest.history(service, null, null, invalidJobId, null, fileName, null);
+		assertEquals(RESTResultCodes.USER_ERROR, historyResult.getCode());
+
+		historyResult = rest.history(service, null, null, null, null, fileName, null);
+		assertEquals(RESTResultCodes.USER_ERROR, historyResult.getCode());
+
+		historyResult = rest.history(null, null, null, null, null, fileName, null);
+		assertEquals(RESTResultCodes.SERVICE_NOT_FOUND, historyResult.getCode());
+	}
+
+	public void testHistoryErrorInvalidServiceName() {
+		String invalidServiceName = UUID.randomUUID().toString();
+		FileResult result = rest.history(invalidServiceName, userUUIDValid, projectValid, "", "", "", null);
+		assertEquals(RESTResultCodes.SERVICE_NOT_FOUND, result.getCode());
+	}
+
+	public void testDownloadSuccess() {
+		JobSubmissonResult jobResult = null;
+		try {
+			String parameters = loadParameters();
+			jobResult = jobSubmissionRest.run(service, userUUIDValid, projectValid, applicationValid, versionValid, null, parameters, null, null);
+			assertEquals(RESTResultCodes.OK, jobResult.getCode());
+
+			StatusResult statusResult;
+			do {
+				statusResult = rest.get(service, userUUIDValid, projectValid, jobResult.getJobId(), null);
+				if (statusResult.getStatus().equals(Status.FAILED) || statusResult.getStatus().equals(Status.UNDETERMINED)) {
+					assertTrue(false);
+				}
+			} while (!statusResult.getStatus().equals(Status.DONE));
+
+			FileResult fileResult = rest.history(service, userUUIDValid, projectValid, jobResult.getJobId(), null, null, null);
+			FileResult file = fillResults(jobResult.getJobId(), fileResult);
+
+			if (file != null) {
+				Response response = rest.download(service, userUUIDValid, projectValid, jobResult.getJobId(), file.getParentPath(), file.getName(), null);
+				assertEquals(RESTResultCodes.OK, response.getStatus());
+			} else {
+				// no file was found
+				assertTrue(true);
+			}
+
+		} catch (Exception e) {
+			assertTrue(false);
+		} finally {
+			try {
+				result = rest.delete(service, userUUIDValid, projectValid, jobResult.getJobId(), null);
+				assertEquals(RESTResultCodes.OK, result.getCode());
+
+				clearParameters();
+			} catch (Exception e) {
+				assertTrue(false);
+			}
+		}
+	}
+
+	public void testDownloadErrorNull() {
+		String invalidJobId = UUID.randomUUID().toString();
+		try {
+			Response response = rest.download(service, userUUIDValid, projectValid, invalidJobId, null, null, null);
+			assertEquals(RESTResultCodes.NO_CONTENT, response.getStatus());
+
+			response = rest.download(service, userUUIDValid, projectValid, null, null, "file", null);
+			assertEquals(RESTResultCodes.NO_CONTENT, response.getStatus());
+
+			response = rest.download(service, userUUIDValid, projectValid, null, null, null, null);
+			assertEquals(RESTResultCodes.NO_CONTENT, response.getStatus());
+
+			response = rest.download(service, null, userUUIDValid, invalidJobId, null, "file", null);
+			assertEquals(RESTResultCodes.NO_CONTENT, response.getStatus());
+
+			response = rest.download(service, null, userUUIDValid, invalidJobId, null, null, null);
+			assertEquals(RESTResultCodes.NO_CONTENT, response.getStatus());
+
+			response = rest.download(service, null, userUUIDValid, null, null, "file", null);
+			assertEquals(RESTResultCodes.NO_CONTENT, response.getStatus());
+
+			response = rest.download(service, null, userUUIDValid, null, null, null, null);
+			assertEquals(RESTResultCodes.NO_CONTENT, response.getStatus());
+
+			response = rest.download(null, null, null, null, null, "file", null);
+			assertEquals(RESTResultCodes.NO_CONTENT, response.getStatus());
+		} catch (Exception e) {
+			assertTrue(false);
+		}
+	}
+
+	public void testDownloadErrorInvalidServiceName() {
+		String invalidServiceName = UUID.randomUUID().toString();
+		Response response = rest.download(invalidServiceName, userUUIDValid, projectValid, "", "", "", null);
+		assertEquals(RESTResultCodes.NO_CONTENT, response.getStatus());
+	}
+
+	private FileResult fillResults(String jobId, FileResult fileResult) {
+		if (fileResult.isDirectory()) {
+			//if (fileResult.getDirectory() == "true") {
+			List<FileResult> children = fileResult.getChildren();
+			for (FileResult child : children) {
+				FileResult r = rest.history(service, userUUIDValid, projectValid, jobId, child.getParentPath(), child.getName(), null);
+				FileResult result = fillResults(jobId, r);
+				if (result != null) {
+					return result;
+				}
+			}
+		} else {
+			return fileResult;
+		}
+		return null;
+	}
+
+}
